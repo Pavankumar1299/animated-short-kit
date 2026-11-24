@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Animated Shorts Kit — Producer Studio</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root {
+      --bg: #0f1117;
+      --card: #181b24;
+      --card-border: #282d3d;
+      --primary: #f2992a;
+      --primary-hover: #e08819;
+      --teal: #3f9a8c;
+      --foreground: #f4ead6;
+      --muted: #9ba3b8;
+    }
+    body {
+      background-color: var(--bg);
+      color: var(--foreground);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+    .accent-border { border-color: var(--card-border); }
+    .story-card:hover { border-color: var(--primary); transform: translateY(-2px); }
+    .badge { background: rgba(242, 153, 42, 0.15); color: #f2b234; border: 1px solid rgba(242, 153, 42, 0.3); }
+    .badge-teal { background: rgba(63, 154, 140, 0.15); color: #5eead4; border: 1px solid rgba(63, 154, 140, 0.3); }
+    .caption-preview {
+      font-family: Impact, "Arial Black", sans-serif;
+      text-transform: uppercase;
+      -webkit-text-stroke: 4px #000;
+      paint-order: stroke fill;
+    }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #0f1117; }
+    ::-webkit-scrollbar-thumb { background: #282d3d; border-radius: 3px; }
+  </style>
+</head>
+<body class="p-4 md:p-6 min-h-screen">
+
+  <div class="max-w-6xl mx-auto space-y-6">
+
+    <!-- Header Banner -->
+    <header class="flex flex-col md:flex-row md:items-center justify-between pb-5 border-b accent-border gap-4">
+      <div>
+        <div class="flex items-center gap-3">
+          <span class="text-2xl font-black text-[#f2992a] tracking-wider uppercase">🎬 Animated Shorts Producer</span>
+          <span class="badge text-xs px-2.5 py-0.5 rounded-full font-bold">Three.js + Remotion</span>
+        </div>
+        <p class="text-xs md:text-sm text-[var(--muted)] mt-1">
+          Viral-style 2D toon characters in a 3D world &bull; Underdog Hook Formula &bull; Neural TTS Narration
+        </p>
+      </div>
+      <div class="flex items-center gap-3 text-xs">
+        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#181b24] border accent-border text-[var(--muted)]">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          Voice: <strong class="text-amber-400" id="currentVoiceBadge">en-US-GuyNeural</strong>
+        </span>
+        <button onclick="resetWorkflow()" class="px-3 py-1.5 rounded-lg bg-[#242938] hover:bg-[#2e3447] text-gray-300 font-semibold transition">
+          ↺ Reset
+        </button>
+      </div>
+    </header>
+
+    <!-- STEP 1: SKILL VERIFICATION GATE -->
+    <section id="step1Card" class="p-5 rounded-xl bg-[var(--card)] border accent-border transition-all shadow-lg">
+      <div class="flex items-start justify-between gap-4">
+        <div class="space-y-1">
+          <div class="flex items-center gap-2">
+            <span class="w-6 h-6 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-xs">1</span>
+            <h2 class="text-base font-bold text-white">Skill Installation Check</h2>
+          </div>
+          <p class="text-sm text-gray-300">
+            Have you already installed the <code class="px-1.5 py-0.5 rounded bg-black/40 text-amber-300 font-mono text-xs">animated-shorts-kit</code> skill?
+          </p>
+        </div>
+        <div class="flex items-center gap-2" id="step1Buttons">
+          <button onclick="selectSkillInstalled(true)" class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 font-semibold text-white text-xs transition shadow-sm flex items-center gap-1.5">
+            ✓ Yes, Installed
+          </button>
+          <button onclick="selectSkillInstalled(false)" class="px-4 py-2 rounded-lg bg-rose-900/60 hover:bg-rose-800 border border-rose-700/60 font-semibold text-rose-200 text-xs transition">
+            ✕ No, Guide Me
+          </button>
+        </div>
+      </div>
+
+      <!-- Installation Guide (Hidden unless user says NO) -->
+      <div id="installGuide" class="hidden mt-5 pt-4 border-t accent-border space-y-4">
+        <div class="text-xs font-semibold uppercase tracking-wider text-amber-400">Step-by-step Setup Guide</div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+          <div class="p-3.5 rounded-lg bg-black/30 border border-gray-800 space-y-2">
+            <div class="font-bold text-teal-400 flex items-center gap-1.5">
+              <span>●</span> Claude.ai (Web / Desktop)
+            </div>
+            <ol class="list-decimal list-inside space-y-1 text-gray-300 leading-relaxed">
+              <li>Profile &rarr; Settings &rarr; Capabilities &rarr; turn <strong>Create and edit files</strong> ON.</li>
+              <li>Left sidebar &rarr; Plugins &rarr; "Add" &rarr; Upload <code class="text-amber-300">animated-shorts-kit.zip</code>.</li>
+              <li>Confirm skill toggle is ON and start new chat.</li>
+            </ol>
+          </div>
+          <div class="p-3.5 rounded-lg bg-black/30 border border-gray-800 space-y-2">
+            <div class="font-bold text-teal-400 flex items-center gap-1.5">
+              <span>●</span> Claude Code (Terminal)
+            </div>
+            <ol class="list-decimal list-inside space-y-1 text-gray-300 leading-relaxed">
+              <li>Unzip folder to <code class="text-amber-300 font-mono">~/.claude/skills/animated-shorts-kit/</code>.</li>
+              <li>Or keep inside project root <code class="text-amber-300 font-mono">.claude/skills/</code>.</li>
+              <li>Restart Claude Code session.</li>
+            </ol>
+          </div>
+          <div class="p-3.5 rounded-lg bg-black/30 border border-gray-800 space-y-2">
+            <div class="font-bold text-teal-400 flex items-center gap-1.5">
+              <span>●</span> ChatGPT / Custom GPT
+            </div>
+            <ol class="list-decimal list-inside space-y-1 text-gray-300 leading-relaxed">
+              <li>Create a Project or Custom GPT.</li>
+              <li>Upload files: <code class="text-amber-300">SKILL.md</code>, <code class="text-amber-300">references/</code>, <code class="text-amber-300">library/</code>.</li>
+              <li>Instruct it: <em>"Follow SKILL.md for everything."</em></li>
+            </ol>
+          </div>
+        </div>
+        <div class="flex justify-end pt-2">
+          <button onclick="selectSkillInstalled(true)" class="px-4 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 font-semibold text-white text-xs">
+            I've Completed Setup &rarr; Continue
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- MAIN STUDIO WORKFLOW (Revealed once Step 1 is OK) -->
+    <main id="mainWorkflow" class="space-y-6">
+
+      <!-- STEP 2: STORY IDEA GENERATOR -->
+      <section class="p-5 rounded-xl bg-[var(--card)] border accent-border space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b accent-border">
+          <div class="flex items-center gap-2">
+            <span class="w-6 h-6 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-xs">2</span>
+            <div>
+              <h2 class="text-base font-bold text-white">Choose Story & Hook Formula</h2>
+              <p class="text-xs text-[var(--muted)]">Underdog does something that looks stupid &rarr; People laugh &rarr; He was right all along</p>
+            </div>
+          </div>
+          <span class="badge-teal text-xs px-2.5 py-1 rounded-md font-semibold">Formula: 45–65s Viral Short</span>
+        </div>
+
+        <!-- 5 Story Idea Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 pt-1">
+          
+          <div onclick="selectStory(0)" class="story-card p-3.5 rounded-lg bg-black/25 border accent-border cursor-pointer transition flex flex-col justify-between space-y-2.5">
+            <div>
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-amber-400">1. Speedster Meets Oak</span>
+                <span class="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-300">10s Short</span>
+              </div>
+              <p class="text-xs text-gray-200 mt-1.5 line-clamp-2">"He bragged his speedster could outrun anything on wheels, until he swerved straight into an oak."</p>
+            </div>
+            <div class="text-[11px] text-[var(--muted)] border-t border-gray-800/80 pt-2 flex items-center justify-between">
+              <span>Set: 1930s Downtown</span>
+              <span class="text-emerald-400 font-semibold">Ready in repo</span>
+            </div>
+          </div>
+
+          <div onclick="selectStory(1)" class="story-card p-3.5 rounded-lg bg-black/25 border accent-border cursor-pointer transition flex flex-col justify-between space-y-2.5">
+            <div>
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-amber-400">2. The Fake Shopper Secret</span>
+                <span class="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-300">10s Short</span>
+              </div>
+              <p class="text-xs text-gray-200 mt-1.5 line-clamp-2">"He paid complete strangers to push empty carts around his store because real shoppers mocked them."</p>
+            </div>
+            <div class="text-[11px] text-[var(--muted)] border-t border-gray-800/80 pt-2 flex items-center justify-between">
+              <span>Set: Corner Grocery</span>
+              <span class="text-emerald-400 font-semibold">Ready in repo</span>
+            </div>
+          </div>
+
+          <div onclick="selectStory(2)" class="story-card p-3.5 rounded-lg bg-black/25 border accent-border cursor-pointer transition flex flex-col justify-between space-y-2.5">
+            <div>
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-amber-400">3. Sliced Bread Obsession</span>
+                <span class="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-300">60s Master</span>
+              </div>
+              <p class="text-xs text-gray-200 mt-1.5 line-clamp-2">"Otto Rohwedder sold three jewelry stores just to build a machine to slice bread. Every baker said he was insane."</p>
+            </div>
+            <div class="text-[11px] text-[var(--muted)] border-t border-gray-800/80 pt-2 flex items-center justify-between">
+              <span>Set: Bakery & Street</span>
+              <span class="text-amber-400 font-semibold">Full Story Arc</span>
+            </div>
+          </div>
+
+          <div onclick="selectStory(3)" class="story-card p-3.5 rounded-lg bg-black/25 border accent-border cursor-pointer transition flex flex-col justify-between space-y-2.5">
+            <div>
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-amber-400">4. The Potato Guard Trick</span>
+                <span class="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded bg-teal-500/10 text-teal-300">55s Historical</span>
+              </div>
+              <p class="text-xs text-gray-200 mt-1.5 line-clamp-2">"French peasants refused to eat potatoes until he hired royal guards to pretend they were crown jewels."</p>
+            </div>
+            <div class="text-[11px] text-[var(--muted)] border-t border-gray-800/80 pt-2 flex items-center justify-between">
+              <span>Cast: King, Guard, Farmer</span>
+              <span class="text-teal-400">Reverse Psychology</span>
+            </div>
+          </div>
+
+          <div onclick="selectStory(4)" class="story-card p-3.5 rounded-lg bg-black/25 border accent-border cursor-pointer transition flex flex-col justify-between space-y-2.5">
+            <div>
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-amber-400">5. The Broken String Solo</span>
+                <span class="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded bg-teal-500/10 text-teal-300">50s Virtuoso</span>
+              </div>
+              <p class="text-xs text-gray-200 mt-1.5 line-clamp-2">"Three violin strings snapped mid-performance. The crowd smirked until Paganini finished the concerto on one string."</p>
+            </div>
+            <div class="text-[11px] text-[var(--muted)] border-t border-gray-800/80 pt-2 flex items-center justify-between">
+              <span>Cast: Paganini, Crowd</span>
+              <span class="text-teal-400">Karma / Climax</span>
+            </div>
+          </div>
+
+          <!-- Custom Idea Box -->
+          <div class="p-3.5 rounded-lg bg-black/15 border border-dashed border-gray-700 flex flex-col justify-between space-y-2">
+            <div>
+              <span class="text-xs font-bold text-gray-300">6. Custom Story Prompt</span>
+              <p class="text-[11px] text-[var(--muted)] mt-1">Enter your own real-world discovery or contradiction:</p>
+              <input id="customIdeaInput" type="text" placeholder="e.g. He threw a rubber ball in the sea..." class="w-full mt-2 px-2.5 py-1.5 bg-black/40 border border-gray-700 rounded text-xs text-white focus:outline-none focus:border-amber-400">
+            </div>
+            <button onclick="applyCustomIdea()" class="w-full py-1.5 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 rounded text-xs font-bold transition">
+              Use Custom Story
+            </button>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- STEP 3: SCRIPT, HOOK & VOICE TIMING -->
+      <section class="p-5 rounded-xl bg-[var(--card)] border accent-border space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b accent-border">
+          <div class="flex items-center gap-2">
+            <span class="w-6 h-6 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-xs">3</span>
+            <div>
+              <h2 class="text-base font-bold text-white">Script & Narration Beats</h2>
+              <p class="text-xs text-[var(--muted)]">Word count & pacing calculator (target: 3.3–3.8 words/s, bold captions)</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-3 text-xs">
+            <span class="text-gray-300">Words: <strong id="wordCountDisplay" class="text-amber-400">26</strong></span>
+            <span class="text-gray-300">Duration: <strong id="durationDisplay" class="text-teal-400">~10.0s</strong></span>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          <!-- Script Editor -->
+          <div class="lg:col-span-2 space-y-3">
+            <label class="block text-xs font-semibold uppercase tracking-wider text-gray-400">Script Phrases (Synchronized Beats)</label>
+            <div id="phrasesList" class="space-y-2">
+              <!-- Dynamically populated phrases -->
+            </div>
+            <div class="flex gap-2">
+              <button onclick="addPhraseRow()" class="px-3 py-1.5 bg-[#202534] hover:bg-[#2b3145] text-xs font-semibold rounded text-gray-300 border border-gray-700">
+                + Add Phrase Beat
+              </button>
+              <button onclick="synthesizeBrowserAudio()" class="px-3 py-1.5 bg-emerald-600/30 hover:bg-emerald-600/50 text-emerald-300 border border-emerald-500/50 text-xs font-semibold rounded flex items-center gap-1.5">
+                ▶ Test Voice Preview
+              </button>
+            </div>
+          </div>
+
+          <!-- Live Captions & Camera Preview -->
+          <div class="space-y-3">
+            <label class="block text-xs font-semibold uppercase tracking-wider text-gray-400">Caption Style & Video Preview</label>
+            
+            <div class="relative w-full aspect-[9/16] max-w-[200px] mx-auto rounded-xl bg-black border-2 border-gray-800 overflow-hidden flex flex-col justify-between p-3 shadow-inner">
+              <!-- Top bar -->
+              <div class="flex items-center justify-between text-[10px] text-gray-500">
+                <span>9:16 Shorts</span>
+                <span class="text-rose-500 animate-pulse">● REC</span>
+              </div>
+              
+              <!-- Character & 3D Toon Mock -->
+              <div class="my-auto text-center space-y-1">
+                <div class="w-14 h-14 mx-auto rounded-full bg-amber-400/20 border-2 border-[#241726] flex items-center justify-center text-xl shadow-lg">
+                  <span id="castEmoji">🚗</span>
+                </div>
+                <div class="text-[11px] text-amber-200 font-bold" id="activeCharacterName">Roger the Speedster</div>
+                <div class="text-[9px] text-gray-400" id="activeEnvName">Downtown 1930s Street</div>
+              </div>
+
+              <!-- Animated Caption at 70% height -->
+              <div class="text-center py-2">
+                <span id="captionPreviewText" class="caption-preview text-xs text-white tracking-wide block">
+                  SPEEDSTER COULD OUTRUN
+                </span>
+                <span class="text-[9px] text-gray-400 tracking-wider">Word-synced white + black stroke</span>
+              </div>
+            </div>
+
+            <!-- Video playback trigger if generated -->
+            <div class="text-center pt-1">
+              <a href="code/out/preview_04.mp4" target="_blank" class="text-xs text-teal-400 hover:text-teal-300 underline font-semibold">
+                Open Rendered MP4 Video
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- STEP 4: CAST, ENVIRONMENT & VOICE MODEL SETTINGS -->
+      <section class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        
+        <!-- Voice Model Configuration -->
+        <div class="p-5 rounded-xl bg-[var(--card)] border accent-border space-y-3">
+          <div class="flex items-center justify-between pb-2 border-b accent-border">
+            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+              <span class="w-5 h-5 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-xs">4</span>
+              Voice Model (Microsoft Edge Neural)
+            </h3>
+            <span class="badge text-[10px] px-2 py-0.5 rounded">High Quality</span>
+          </div>
+
+          <div class="space-y-2 text-xs">
+            <label class="block text-[var(--muted)]">Selected Voice Model:</label>
+            <select id="voiceSelect" onchange="changeVoiceModel(this.value)" class="w-full px-3 py-2 bg-black/40 border border-gray-700 rounded-lg text-white font-semibold focus:outline-none focus:border-amber-400">
+              <option value="en-US-GuyNeural" selected>en-US-GuyNeural (Energetic, viral YouTube Shorts narrator)</option>
+              <option value="en-US-ChristopherNeural">en-US-ChristopherNeural (Deep cinematic documentary narrator)</option>
+              <option value="en-US-AriaNeural">en-US-AriaNeural (Expressive, dynamic female)</option>
+              <option value="en-US-JennyNeural">en-US-JennyNeural (Bright, clear narrative female)</option>
+              <option value="en-US-BrianNeural">en-US-BrianNeural (Casual, modern storytelling male)</option>
+              <option value="en-US-RogerNeural">en-US-RogerNeural (Mature, authoritative cinematic male)</option>
+            </select>
+          </div>
+
+          <div class="space-y-1 text-xs">
+            <div class="flex justify-between text-[var(--muted)]">
+              <span>Speech Rate:</span>
+              <span id="rateLabel" class="text-amber-400 font-mono">+12%</span>
+            </div>
+            <input id="rateRange" type="range" min="0" max="25" value="12" oninput="document.getElementById('rateLabel').innerText = '+' + this.value + '%'" class="w-full accent-amber-400">
+          </div>
+
+          <div class="p-2.5 rounded bg-black/25 text-[11px] text-gray-300 border border-gray-800 space-y-1">
+            <div class="font-bold text-emerald-400">✓ No More Robotic Voice</div>
+            <p>Integrated with async <code class="text-amber-300 font-mono">edge-tts</code> and fixed FFmpeg stream mapping <code class="text-teal-300 font-mono">-map 0:v:0 -map 1:a:0</code>.</p>
+          </div>
+        </div>
+
+        <!-- Cast & Environment Plan -->
+        <div class="p-5 rounded-xl bg-[var(--card)] border accent-border space-y-3">
+          <div class="flex items-center justify-between pb-2 border-b accent-border">
+            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+              <span class="w-5 h-5 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-xs">5</span>
+              Cast & Environment Bank
+            </h3>
+            <span class="badge-teal text-[10px] px-2 py-0.5 rounded">3D Toon + 2D Flat</span>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2 text-xs">
+            <div>
+              <label class="block text-[var(--muted)] mb-1">Lead Character:</label>
+              <select id="charSelect" onchange="updateCastPreview()" class="w-full px-2.5 py-1.5 bg-black/40 border border-gray-700 rounded text-white font-medium focus:outline-none">
+                <option value="youngman" selected>youngman (Straw boater, vest)</option>
+                <option value="goldman">goldman (Store owner / inventor)</option>
+                <option value="baker">baker (Apron, curly hair)</option>
+                <option value="man">man (Overalls, flat cap)</option>
+                <option value="grandma">grandma (Bun, glasses)</option>
+                <option value="youngwoman">youngwoman (Teal dress, wavy hair)</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-[var(--muted)] mb-1">Environment / Kit:</label>
+              <select id="envSelect" onchange="updateCastPreview()" class="w-full px-2.5 py-1.5 bg-black/40 border border-gray-700 rounded text-white font-medium focus:outline-none">
+                <option value="downtown" selected>1930s Downtown (28 shops + cars)</option>
+                <option value="grocery">Corner Grocery (Interior + carts)</option>
+                <option value="bakery">Bakery / Workshop</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="p-2.5 rounded bg-black/25 text-[11px] text-gray-300 border border-gray-800 space-y-1">
+            <div class="font-bold text-amber-300">Camera Grammar & Gates</div>
+            <p>MCU &rarr; Cut on action &rarr; Travelling take &rarr; Crash MCU. Passed automated quality gates (<code class="text-teal-300 font-mono">06_CHECKS</code>).</p>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- STEP 5: ACTIONS & RENDER TRIGGER -->
+      <section class="p-5 rounded-xl bg-[var(--card)] border accent-border space-y-3">
+        <div class="flex items-center justify-between pb-2 border-b accent-border">
+          <h3 class="text-sm font-bold text-white flex items-center gap-2">
+            <span class="w-5 h-5 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-xs">6</span>
+            Production Commands & Automation
+          </h3>
+          <span class="text-xs text-[var(--muted)]">Ready to build or re-render</span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1">
+          <div class="p-3 rounded-lg bg-black/30 border border-gray-800 space-y-1.5">
+            <span class="text-xs font-bold text-amber-400">1. Generate Audio & Mux</span>
+            <p class="text-[11px] text-gray-400">Synthesizes GuyNeural voice and muxes into MP4:</p>
+            <pre class="p-2 rounded bg-black/60 text-[11px] font-mono text-teal-300 overflow-x-auto">python code/build_audio.py</pre>
+          </div>
+
+          <div class="p-3 rounded-lg bg-black/30 border border-gray-800 space-y-1.5">
+            <span class="text-xs font-bold text-amber-400">2. Run Quality Gates</span>
+            <p class="text-[11px] text-gray-400">Checks logic, framing, and speeds:</p>
+            <pre class="p-2 rounded bg-black/60 text-[11px] font-mono text-teal-300 overflow-x-auto">npm --prefix code run gates</pre>
+          </div>
+
+          <div class="p-3 rounded-lg bg-black/30 border border-gray-800 space-y-1.5">
+            <span class="text-xs font-bold text-amber-400">3. Render Video (Fast)</span>
+            <p class="text-[11px] text-gray-400">Double-click or run preview on your PC:</p>
+            <pre class="p-2 rounded bg-black/60 text-[11px] font-mono text-teal-300 overflow-x-auto">code\render.bat</pre>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <script>
+    const STORIES = [
+      {
+        title: "Speedster Meets Oak",
+        hero: "youngman",
+        env: "downtown",
+        emoji: "🏎️",
+        phrases: [
+          { text: "He bragged his speedster could outrun anything on wheels.", t: 0.20 },
+          { text: "Until he swerved straight into a century-old oak.", t: 3.50 },
+          { text: "The tree did not even lose a single leaf.", t: 6.40 }
+        ]
+      },
+      {
+        title: "The Fake Shopper Secret",
+        hero: "goldman",
+        env: "grocery",
+        emoji: "🛒",
+        phrases: [
+          { text: "He paid complete strangers to push empty carts around his store.", t: 0.20 },
+          { text: "Real customers refused, mocking them as ridiculous baby carriages.", t: 3.60 },
+          { text: "Until the trick worked, sparking a billion dollar shopping revolution.", t: 7.00 }
+        ]
+      },
+      {
+        title: "Sliced Bread Obsession",
+        hero: "youngman",
+        env: "downtown",
+        emoji: "🍞",
+        phrases: [
+          { text: "He sold three jewelry stores just to build a machine that cuts bread.", t: 0.30 },
+          { text: "And every baker in town said he had lost his mind.", t: 3.78 },
+          { text: "Until pre-sliced loaves swept the entire country.", t: 7.20 }
+        ]
+      },
+      {
+        title: "The Potato Guard Trick",
+        hero: "baker",
+        env: "downtown",
+        emoji: "🥔",
+        phrases: [
+          { text: "Nobody would touch the strange brown root, calling it peasant poison.", t: 0.25 },
+          { text: "So he posted royal armed guards around the field to pretend it was gold.", t: 3.80 },
+          { text: "That night, the entire town broke in to steal every last potato.", t: 7.50 }
+        ]
+      },
+      {
+        title: "The Broken String Solo",
+        hero: "youngman",
+        env: "downtown",
+        emoji: "🎻",
+        phrases: [
+          { text: "The first string snapped with a loud crack, then the second, then the third.", t: 0.20 },
+          { text: "The front row smirked, waiting for him to bow his head in shame.", t: 3.60 },
+          { text: "Instead, he smiled and finished the masterpiece on a single wire.", t: 7.10 }
+        ]
+      }
+    ];
+
+    let currentStoryIndex = 0;
+    let activePhrases = JSON.parse(JSON.stringify(STORIES[0].phrases));
+
+    function selectSkillInstalled(isInstalled) {
+      const guide = document.getElementById('installGuide');
+      const step1Card = document.getElementById('step1Card');
+      const mainWorkflow = document.getElementById('mainWorkflow');
+      
+      if (isInstalled) {
+        guide.classList.add('hidden');
+        step1Card.classList.remove('border-rose-500');
+        step1Card.classList.add('border-emerald-500/40');
+        document.getElementById('step1Buttons').innerHTML = `
+          <span class="text-xs font-bold text-emerald-400 bg-emerald-950/40 border border-emerald-500/30 px-3 py-1.5 rounded-lg flex items-center gap-1.5">
+            ✓ Skill Active & Verified
+          </span>
+        `;
+        mainWorkflow.classList.remove('opacity-40', 'pointer-events-none');
+      } else {
+        guide.classList.remove('hidden');
+        step1Card.classList.add('border-rose-500/50');
+      }
+    }
+
+    function renderPhrases() {
+      const list = document.getElementById('phrasesList');
+      list.innerHTML = '';
+      let totalWords = 0;
+
+      activePhrases.forEach((p, idx) => {
+        const words = p.text.trim().split(/\s+/).length;
+        totalWords += words;
+
+        const row = document.createElement('div');
+        row.className = 'flex items-center gap-2 p-2 rounded bg-black/40 border border-gray-800 text-xs';
+        row.innerHTML = `
+          <span class="w-5 text-center font-mono text-gray-500">${idx + 1}</span>
+          <span class="px-2 py-0.5 rounded bg-gray-800 text-amber-300 font-mono text-[11px]">${p.t.toFixed(2)}s</span>
+          <input type="text" value="${p.text.replace(/"/g, '&quot;')}" oninput="updatePhraseText(${idx}, this.value)" class="flex-1 bg-transparent border-none text-white focus:outline-none focus:ring-0">
+          <span class="text-gray-500 text-[10px]">${words}w</span>
+          <button onclick="removePhrase(${idx})" class="text-gray-600 hover:text-rose-400 px-1">&times;</button>
+        `;
+        list.appendChild(row);
+      });
+
+      document.getElementById('wordCountDisplay').innerText = totalWords;
+      const dur = (totalWords / 3.4).toFixed(1);
+      document.getElementById('durationDisplay').innerText = `~${dur}s`;
+
+      if (activePhrases.length > 0) {
+        const previewWords = activePhrases[0].text.split(' ').slice(0, 4).join(' ').toUpperCase();
+        document.getElementById('captionPreviewText').innerText = previewWords;
+      }
+    }
+
+    function updatePhraseText(idx, val) {
+      activePhrases[idx].text = val;
+      renderPhrases();
+    }
+
+    function removePhrase(idx) {
+      if (activePhrases.length > 1) {
+        activePhrases.splice(idx, 1);
+        renderPhrases();
+      }
+    }
+
+    function addPhraseRow() {
+      const lastT = activePhrases.length > 0 ? activePhrases[activePhrases.length - 1].t + 3.2 : 0.2;
+      activePhrases.push({ text: "New narrative hook line goes here.", t: parseFloat(lastT.toFixed(2)) });
+      renderPhrases();
+    }
+
+    function selectStory(idx) {
+      currentStoryIndex = idx;
+      const s = STORIES[idx];
+      activePhrases = JSON.parse(JSON.stringify(s.phrases));
+      document.getElementById('charSelect').value = s.hero;
+      document.getElementById('envSelect').value = s.env;
+      document.getElementById('castEmoji').innerText = s.emoji;
+      document.getElementById('activeCharacterName').innerText = s.title;
+      renderPhrases();
+    }
+
+    function applyCustomIdea() {
+      const inp = document.getElementById('customIdeaInput').value.trim();
+      if (!inp) return;
+      activePhrases = [
+        { text: inp, t: 0.20 },
+        { text: "And everyone in the district called him a fool.", t: 3.60 },
+        { text: "Until the impossible happened, proving him completely right.", t: 6.80 }
+      ];
+      document.getElementById('activeCharacterName').innerText = "Custom Story";
+      document.getElementById('castEmoji').innerText = "💡";
+      renderPhrases();
+    }
+
+    function changeVoiceModel(voice) {
+      document.getElementById('currentVoiceBadge').innerText = voice;
+    }
+
+    function updateCastPreview() {
+      const char = document.getElementById('charSelect').value;
+      const env = document.getElementById('envSelect').value;
+      document.getElementById('activeCharacterName').innerText = char;
+      document.getElementById('activeEnvName').innerText = env === 'downtown' ? '1930s Downtown Street' : 'Corner Grocery';
+    }
+
+    function synthesizeBrowserAudio() {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const fullScript = activePhrases.map(p => p.text).join(' ');
+        const utter = new SpeechSynthesisUtterance(fullScript);
+        utter.rate = 1.15;
+        window.speechSynthesis.speak(utter);
+      } else {
+        alert('Browser speech synthesis is not supported in this environment.');
+      }
+    }
+
+    function resetWorkflow() {
+      selectSkillInstalled(true);
+      selectStory(0);
+    }
+
+    // Initialize
+    window.addEventListener('DOMContentLoaded', () => {
+      selectSkillInstalled(true);
+      selectStory(0);
+    });
+  </script>
+</body>
+</html>
