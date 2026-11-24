@@ -2,15 +2,15 @@
 node_modules/
 
 # Remotion render output and generated media
-out/
-*.mp4
-*.webm
-*.mov
-*.gif
-*.png
-*.jpg
-*.jpeg
-*.webp
+# out/
+# *.mp4
+# *.webm
+# *.mov
+# *.gif
+# *.png
+# *.jpg
+# *.jpeg
+# *.webp
 
 # Build and tool caches
 .cache/
