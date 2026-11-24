@@ -11,27 +11,37 @@ TOTAL_DUR = 10.0
 total_samples = int(SR * TOTAL_DUR)
 
 VOICES = {
-    "guy": "en-US-GuyNeural",               # Energetic, viral YouTube shorts narrator
+    "guy": "en-US-GuyNeural",                 # Energetic, viral YouTube shorts narrator (preferred)
     "christopher": "en-US-ChristopherNeural", # Deep, cinematic documentary narrator
-    "jenny": "en-US-JennyNeural",           # Clear, bright narrative female
-    "aria": "en-US-AriaNeural",             # Expressive, dynamic female
-    "brian": "en-US-BrianNeural",           # Casual, modern storytelling male
-    "roger": "en-US-RogerNeural"            # Mature, authoritative cinematic male
+    "jenny": "en-US-JennyNeural",             # Clear, bright narrative female
+    "aria": "en-US-AriaNeural",               # Expressive, dynamic female
+    "brian": "en-US-BrianNeural",             # Casual, modern storytelling male
+    "roger": "en-US-RogerNeural"              # Mature, authoritative cinematic male
 }
 
-async def synthesize_phrase(text: str, voice: str, out_path: str, rate="+5%"):
+async def synthesize_phrase(text: str, voice: str, out_path: str, rate="+12%"):
     comm = edge_tts.Communicate(text, voice, rate=rate)
     await comm.save(out_path)
 
-def generate_voice_track(phrases, voice="en-US-GuyNeural", video_id="04_speed_car"):
-    out_dir = f"public/{video_id}"
+def generate_voice_track(phrases, voice="en-US-GuyNeural", video_id="04_speed_car", code_dir="code"):
+    if not os.path.exists(os.path.join(code_dir, "public")):
+        if os.path.exists("public"):
+            code_dir = "."
+        elif os.path.exists("../public"):
+            code_dir = ".."
+        elif os.path.exists("../../public"):
+            code_dir = "../.."
+        elif os.path.exists("../../../public"):
+            code_dir = "../../.."
+            
+    out_dir = os.path.normpath(os.path.join(code_dir, f"public/{video_id}"))
     os.makedirs(out_dir, exist_ok=True)
     
     voice_track = np.zeros(total_samples, dtype=np.float32)
     
     for i, (text, t_start) in enumerate(phrases):
-        mp3_path = f"{out_dir}/temp_{i}.mp3"
-        wav_path = f"{out_dir}/temp_{i}.wav"
+        mp3_path = os.path.join(out_dir, f"temp_{i}.mp3")
+        wav_path = os.path.join(out_dir, f"temp_{i}.wav")
         
         asyncio.run(synthesize_phrase(text, voice, mp3_path))
         
@@ -55,7 +65,7 @@ def generate_voice_track(phrases, voice="en-US-GuyNeural", video_id="04_speed_ca
     if max_v > 0:
         voice_track = voice_track / max_v * 0.95
         
-    out_voice_wav = f"{out_dir}/voice.wav"
+    out_voice_wav = os.path.join(out_dir, "voice.wav")
     v_int = (np.clip(voice_track, -1.0, 1.0) * 32767).astype(np.int16)
     with wave.open(out_voice_wav, 'wb') as w:
         w.setnchannels(1)
@@ -64,10 +74,10 @@ def generate_voice_track(phrases, voice="en-US-GuyNeural", video_id="04_speed_ca
         w.writeframes(v_int.tobytes())
         
     print(f"Synthesized neural voice '{voice}' -> {out_voice_wav}")
-    return voice_track
+    return voice_track, code_dir
 
-def mux_video(video_id, voice_track):
-    bed_path = f"public/{video_id}/bed.wav"
+def mux_video(video_id, voice_track, code_dir="code"):
+    bed_path = os.path.normpath(os.path.join(code_dir, f"public/{video_id}/bed.wav"))
     if os.path.exists(bed_path):
         with wave.open(bed_path, 'rb') as w:
             frames = w.readframes(w.getnframes())
@@ -84,52 +94,55 @@ def mux_video(video_id, voice_track):
     mix_stereo = np.column_stack([mix, mix])
     mix_int = (mix_stereo * 32767).astype(np.int16)
     
-    mix_path = f"public/{video_id}/mixed.wav"
+    mix_path = os.path.normpath(os.path.join(code_dir, f"public/{video_id}/mixed.wav"))
     with wave.open(mix_path, 'wb') as w:
         w.setnchannels(2)
         w.setsampwidth(2)
         w.setframerate(SR)
         w.writeframes(mix_int.tobytes())
         
-    # Mux into out/preview_<id>.mp4
+    # Mux into out/ videos if present
     video_num = video_id.split('_')[0]
-    out_mp4 = f"out/preview_{video_num}.mp4"
-    if not os.path.exists(out_mp4):
-        out_mp4 = f"out/preview_{video_id}.mp4"
-        
-    if os.path.exists(out_mp4):
-        temp_mp4 = f"out/temp_mux_{video_num}.mp4"
-        subprocess.run([
-            "ffmpeg", "-y",
-            "-i", out_mp4,
-            "-i", mix_path,
-            "-c:v", "copy",
-            "-c:a", "aac",
-            "-b:a", "192k",
-            "-shortest",
-            temp_mp4
-        ], check=True)
-        if os.path.exists(temp_mp4):
-            os.replace(temp_mp4, out_mp4)
-            print(f"Muxed fresh audio directly into {out_mp4}!")
+    out_dir = os.path.normpath(os.path.join(code_dir, "out"))
+    targets = [f"preview_{video_num}.mp4", f"preview_{video_id}.mp4", f"{video_id}_preview.mp4"]
+    for fname in targets:
+        out_mp4 = os.path.join(out_dir, fname)
+        if os.path.exists(out_mp4):
+            temp_mp4 = os.path.join(out_dir, f"temp_mux_{fname}")
+            subprocess.run([
+                "ffmpeg", "-y",
+                "-i", out_mp4,
+                "-i", mix_path,
+                "-map", "0:v:0",
+                "-map", "1:a:0",
+                "-c:v", "copy",
+                "-c:a", "aac",
+                "-b:a", "192k",
+                "-shortest",
+                temp_mp4
+            ], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            if os.path.exists(temp_mp4):
+                os.replace(temp_mp4, out_mp4)
+                print(f"Muxed fresh neural audio directly into {out_mp4}!")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Download and apply real neural voice narration.")
     parser.add_argument("--voice", default="guy", help="Voice choice: guy, christopher, jenny, aria, brian, roger or full ShortName")
     parser.add_argument("--video", default="04_speed_car", help="Target video ID")
+    parser.add_argument("--code_dir", default="code", help="Base directory for code/public/out")
     args = parser.parse_args()
     
     v_name = VOICES.get(args.voice.lower(), args.voice)
     
     if args.video == "04_speed_car":
         phrases = [
-            ("He bragged his speedster could outrun anything on wheels.", 0.25),
+            ("He bragged his speedster could outrun anything on wheels.", 0.20),
             ("Until he swerved straight into a century-old oak.", 3.50),
-            ("The tree did not even lose a single leaf.", 6.30)
+            ("The tree did not even lose a single leaf.", 6.40)
         ]
     elif args.video == "03_shopping_cart":
         phrases = [
-            ("He paid complete strangers to push empty carts around his store.", 0.25),
+            ("He paid complete strangers to push empty carts around his store.", 0.20),
             ("Real customers refused, mocking them as ridiculous baby carriages.", 3.60),
             ("Until the trick worked, sparking a billion dollar shopping revolution.", 7.00)
         ]
@@ -139,5 +152,5 @@ if __name__ == "__main__":
             ("And every baker in town said he had lost his mind.", 3.78)
         ]
         
-    v_track = generate_voice_track(phrases, voice=v_name, video_id=args.video)
-    mux_video(args.video, v_track)
+    v_track, c_dir = generate_voice_track(phrases, voice=v_name, video_id=args.video, code_dir=args.code_dir)
+    mux_video(args.video, v_track, code_dir=c_dir)

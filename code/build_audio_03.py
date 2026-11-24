@@ -1,63 +1,55 @@
-import subprocess
+import asyncio
 import os
+import subprocess
 import wave
 import numpy as np
+import edge_tts
 
-os.makedirs('public/03_shopping_cart', exist_ok=True)
+VOICE = "en-US-GuyNeural"
+RATE = "+10%"
+
+out_dir = os.path.join(os.path.dirname(__file__), 'public', '03_shopping_cart')
+os.makedirs(out_dir, exist_ok=True)
 
 SR = 44100
 TOTAL_DUR = 10.0
 total_samples = int(SR * TOTAL_DUR)
 
 phrases = [
-    ("He paid complete strangers to push empty carts around his store.", 0.25, "p1.wav"),
-    ("Real customers refused, mocking them as ridiculous baby carriages.", 3.60, "p2.wav"),
-    ("Until the trick worked, sparking a billion dollar shopping revolution.", 7.00, "p3.wav")
+    ("He paid complete strangers to push empty carts around his store.", 0.20),
+    ("Real customers refused, mocking them as ridiculous baby carriages.", 3.60),
+    ("Until the trick worked, sparking a billion dollar shopping revolution.", 7.00)
 ]
 
-ps_script = """
-Add-Type -AssemblyName System.Speech
-$s = New-Object System.Speech.Synthesis.SpeechSynthesizer
-$s.Rate = 1
-"""
-for text, t, fname in phrases:
-    out_path = os.path.abspath(f"public/03_shopping_cart/{fname}").replace('\\', '/')
-    ps_script += f"""
-$s.SetOutputToWaveFile("{out_path}")
-$s.Speak("{text}")
-"""
-ps_script += "$s.Dispose()\n"
+async def synthesize_all():
+    voice_track = np.zeros(total_samples, dtype=np.float32)
+    for i, (text, t_start) in enumerate(phrases):
+        temp_mp3 = os.path.join(out_dir, f"temp_{i}.mp3")
+        temp_wav = os.path.join(out_dir, f"temp_{i}.wav")
+        comm = edge_tts.Communicate(text, VOICE, rate=RATE)
+        await comm.save(temp_mp3)
+        subprocess.run(["ffmpeg", "-y", "-i", temp_mp3, "-ar", str(SR), "-ac", "1", temp_wav],
+                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
+        with wave.open(temp_wav, 'rb') as w:
+            frames = w.readframes(w.getnframes())
+            audio = np.frombuffer(frames, dtype=np.int16).astype(np.float32) / 32768.0
+            start_idx = int(t_start * SR)
+            end_idx = min(total_samples, start_idx + len(audio))
+            voice_track[start_idx:end_idx] += audio[:end_idx - start_idx]
+        if os.path.exists(temp_mp3):
+            os.remove(temp_mp3)
+        if os.path.exists(temp_wav):
+            os.remove(temp_wav)
 
-subprocess.run(["powershell", "-Command", ps_script], check=True)
+    max_v = np.max(np.abs(voice_track))
+    if max_v > 0:
+        voice_track = voice_track / max_v * 0.95
+    return voice_track
 
-voice_track = np.zeros(total_samples, dtype=np.float32)
-
-for text, t_start, fname in phrases:
-    fpath = f"public/03_shopping_cart/{fname}"
-    with wave.open(fpath, 'rb') as w:
-        n_ch = w.getnchannels()
-        sr = w.getframerate()
-        frames = w.readframes(w.getnframes())
-        audio = np.frombuffer(frames, dtype=np.int16).astype(np.float32) / 32768.0
-        if n_ch == 2:
-            audio = audio.mean(axis=1)
-        if sr != SR:
-            indices = np.round(np.arange(0, len(audio), sr / SR)).astype(int)
-            indices = indices[indices < len(audio)]
-            audio = audio[indices]
-            
-        start_idx = int(t_start * SR)
-        end_idx = min(total_samples, start_idx + len(audio))
-        voice_track[start_idx:end_idx] += audio[:end_idx - start_idx]
-    os.remove(fpath)
-
-max_v = np.max(np.abs(voice_track))
-if max_v > 0:
-    voice_track = voice_track / max_v * 0.95
+voice_track = asyncio.run(synthesize_all())
 
 # Synthesize cheerful store ambience & cash register chime
 bed_track = np.zeros(total_samples, dtype=np.float32)
-# Chime chords at 7.2s, 7.8s, 8.4s
 for chime_t in [7.2, 7.8, 8.4, 9.0]:
     c_idx = int(chime_t * SR)
     c_len = int(0.6 * SR)
@@ -66,7 +58,6 @@ for chime_t in [7.2, 7.8, 8.4, 9.0]:
     end_bell = min(total_samples, c_idx + c_len)
     bed_track[c_idx:end_bell] += bell[:end_bell - c_idx] * 0.25
 
-# Upbeat bass line
 tempo = 135
 beat_dur = 60 / tempo
 beats = np.arange(0, TOTAL_DUR, beat_dur)
@@ -83,13 +74,59 @@ max_b = np.max(np.abs(bed_track))
 if max_b > 0:
     bed_track = bed_track / max_b * 0.5
 
+# Write voice.wav
+voice_wav = os.path.join(out_dir, 'voice.wav')
+voice_int = (np.clip(voice_track, -1.0, 1.0) * 32767).astype(np.int16)
+with wave.open(voice_wav, 'wb') as w:
+    w.setnchannels(1)
+    w.setsampwidth(2)
+    w.setframerate(SR)
+    w.writeframes(voice_int.tobytes())
+
+# Write bed.wav
+bed_wav = os.path.join(out_dir, 'bed.wav')
+bed_stereo = np.column_stack([bed_track, bed_track])
+bed_int = (np.clip(bed_stereo, -1.0, 1.0) * 32767).astype(np.int16)
+with wave.open(bed_wav, 'wb') as w:
+    w.setnchannels(2)
+    w.setsampwidth(2)
+    w.setframerate(SR)
+    w.writeframes(bed_int.tobytes())
+
+# Write full mixed.wav
+mixed_wav = os.path.join(out_dir, 'mixed.wav')
 mix_track = np.clip(voice_track + bed_track * 0.6, -1.0, 1.0)
 mix_stereo = np.column_stack([mix_track, mix_track])
 mix_int = (mix_stereo * 32767).astype(np.int16)
-with wave.open('public/03_shopping_cart/mixed.wav', 'wb') as w:
+with wave.open(mixed_wav, 'wb') as w:
     w.setnchannels(2)
     w.setsampwidth(2)
     w.setframerate(SR)
     w.writeframes(mix_int.tobytes())
 
-print("Audio for 03 generated!")
+print(f"Neural audio ({VOICE}) for 03 generated successfully:")
+print(" - voice.wav:", os.path.getsize(voice_wav), "bytes")
+print(" - bed.wav:", os.path.getsize(bed_wav), "bytes")
+print(" - mixed.wav:", os.path.getsize(mixed_wav), "bytes")
+
+# Mux directly into out/ videos if present
+out_base = os.path.join(os.path.dirname(__file__), 'out')
+for target_name in ['preview_03.mp4', '03_shopping_cart_preview.mp4']:
+    target_path = os.path.join(out_base, target_name)
+    if os.path.exists(target_path):
+        temp_target = os.path.join(out_base, f"temp_mux_{target_name}")
+        subprocess.run([
+            "ffmpeg", "-y",
+            "-i", target_path,
+            "-i", mixed_wav,
+            "-map", "0:v:0",
+            "-map", "1:a:0",
+            "-c:v", "copy",
+            "-c:a", "aac",
+            "-b:a", "192k",
+            "-shortest",
+            temp_target
+        ], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
+        if os.path.exists(temp_target):
+            os.replace(temp_target, target_path)
+            print(f"Muxed fresh neural audio directly into {target_name}!")
