@@ -45,10 +45,15 @@
 
 ---
 
-## Round 2: Next Iterative Targets (Speed + Visual Polish)
-1. **Faster Renders (< 0.15s/frame target)**:
-   - Investigate `Town` static building geometry caching (`React.memo` on `Town` and `Set` in `grocery/store.tsx`) so Remotion doesn't re-reconcile hundreds of static meshes every frame.
-   - Check `03_shopping_cart` render bottleneck (250s for 300f vs 130s for `04_speed_car`) — likely `grocery/store.tsx` shelf/product re-renders.
-2. **Visual Quality & Story Props**:
-   - Add `04_speed_car` impact dust cloud burst at `f = 150` and clear the 6 minor `04_speed_car` framing warnings (`EDGE`/`OFFC`).
-   - Add 3D sticky-note trail stuck to `magee`'s lab coat / bench in `05_postit_notes` and verify all 3 new previews visually.
+## Round 2: Ricks Clips Reference Comparison (`gc07FGjpTa4`, `7xS87iActkU`, `R-mWVMM-LAs`)
+Compared against `references/03_CAMERA_GRAMMAR.md` (which measured `7xS87iActkU` *Perfect Railroads*):
+1. **Different Places / Locations per Beat** (`05_postit_notes`):
+   - [x] `lab`: `x = -22.5, z = 7.35` (outside `FIVE & DIME` workshop with Lab Bench)
+   - [x] `mockery`: `x = 22.4, z = 7.35` (outside `FIRST NATIONAL BANK` — fitting for `banker` 3M boss)
+   - [x] `choir` & `eureka`: `x = -26.5, z = 19.5` (across the street at `MEN'S WEAR`, opposite camera direction `az ~ 172`)
+   - [x] `success`: `x = 30.0, z = 19.5` (across the street at `INSURANCE` plaza with swirling Post-it storm)
+2. **Dynamic Camera Angles & 3-Key Takes (77% moving)**:
+   - [x] Upgraded `05_postit_notes/takes.ts` to 2–3 key takes per beat with low-angle `MCU`/`CU` (`el: -2`), fast `pullpush` reveals (`dur: 0.7..0.85`), and `arc` orbits.
+3. **Verification & Benchmark**:
+   - [x] `gates.ts`: `GATES: PASS  hard=0  waived=0  warnings=0`
+   - [x] Render time (`preview_05.mp4`, 900f): **124.97s (2m 5s, 0.139s/frame)** — **6.4x faster** than the initial ~13+ min baseline!

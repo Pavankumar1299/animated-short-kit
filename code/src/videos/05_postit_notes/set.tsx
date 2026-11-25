@@ -1,4 +1,4 @@
-// 3D Set for 05_postit_notes: Downtown backdrop + shot-specific Lab Bench / Choir Podium + fluttering yellow sticky notes
+// 3D Set for 05_postit_notes: 4 distinct downtown locations (HARDWARE lab, BANK mockery, BOOKS choir, OFFICE SUPPLY finale)
 import React from 'react';
 import * as THREE from 'three';
 import type {Tod} from '../../engine/look/look';
@@ -12,9 +12,9 @@ export const AUDIO: {voice: string | null; bed: string | null} = {
 };
 export const useSetData = () => null;
 
-/** Lab Bench (shots: lab, mockery) placed cleanly behind characters at z=6.2 */
+/** Lab Bench outside FIVE & DIME (x=-22.5, z=6.1) */
 const LabBench: React.FC<{f: number}> = ({f}) => (
-  <group position={[0, 0, 6.2]}>
+  <group position={[-22.5, 0, 6.1]}>
     <mesh position={[0, 0.44, 0]} castShadow receiveShadow>
       <boxGeometry args={[1.7, 0.88, 0.8]} />
       <meshToonMaterial color="#7a3b22" />
@@ -23,7 +23,6 @@ const LabBench: React.FC<{f: number}> = ({f}) => (
       <boxGeometry args={[1.8, 0.06, 0.88]} />
       <meshToonMaterial color="#3a2a22" />
     </mesh>
-    {/* Beakers & flasks */}
     <mesh position={[-0.45, 1.05, 0.1]} castShadow>
       <cylinderGeometry args={[0.07, 0.11, 0.24, 10]} />
       <meshToonMaterial color="#bfe3d8" transparent opacity={0.85} />
@@ -36,7 +35,6 @@ const LabBench: React.FC<{f: number}> = ({f}) => (
       <cylinderGeometry args={[0.04, 0.08, 0.3, 10]} />
       <meshToonMaterial color="#78b9c9" transparent opacity={0.85} />
     </mesh>
-    {/* Test yellow note on bench */}
     <mesh position={[0.35, 0.94, 0.18]} rotation={[-Math.PI / 2, 0, 0.2]} castShadow>
       <planeGeometry args={[0.22, 0.22]} />
       <meshToonMaterial color="#f7ea48" side={THREE.DoubleSide} />
@@ -44,14 +42,13 @@ const LabBench: React.FC<{f: number}> = ({f}) => (
   </group>
 );
 
-/** Choir Music Stand & Hymnbook (shots: choir, eureka) at z=6.2 */
+/** Choir Music Stand & Hymnbook across the street at MEN'S WEAR (x=-26.5, z=20.9, facing -z) */
 const ChoirPodium: React.FC<{f: number}> = ({f}) => {
   const isEureka = f >= 564;
   const fall = ((f - 318) % 60) / 60;
 
   return (
-    <group position={[0, 0, 6.2]}>
-      {/* Wooden Stand */}
+    <group position={[-26.5, 0, 20.9]} rotation={[0, Math.PI, 0]}>
       <mesh position={[0, 0.55, 0]} castShadow receiveShadow>
         <cylinderGeometry args={[0.05, 0.08, 1.1, 10]} />
         <meshToonMaterial color="#543622" />
@@ -60,13 +57,11 @@ const ChoirPodium: React.FC<{f: number}> = ({f}) => {
         <cylinderGeometry args={[0.28, 0.32, 0.08, 12]} />
         <meshToonMaterial color="#3e2617" />
       </mesh>
-      {/* Slanted Desk & Open Hymnbook */}
       <group position={[0, 1.12, 0]} rotation={[0.38, 0, 0]}>
         <mesh castShadow receiveShadow>
           <boxGeometry args={[0.72, 0.04, 0.46]} />
           <meshToonMaterial color="#6b4228" />
         </mesh>
-        {/* Left & Right white hymnbook pages */}
         <mesh position={[-0.16, 0.04, 0]} rotation={[0, 0, 0.08]} castShadow>
           <boxGeometry args={[0.28, 0.03, 0.36]} />
           <meshToonMaterial color="#fbf3e0" />
@@ -75,7 +70,6 @@ const ChoirPodium: React.FC<{f: number}> = ({f}) => {
           <boxGeometry args={[0.28, 0.03, 0.36]} />
           <meshToonMaterial color="#fbf3e0" />
         </mesh>
-        {/* Eureka: sticky yellow note attached cleanly to hymnbook */}
         {isEureka && (
           <mesh position={[0.22, 0.07, 0.08]} rotation={[-Math.PI / 2, 0, 0.12]}>
             <planeGeometry args={[0.15, 0.15]} />
@@ -83,7 +77,6 @@ const ChoirPodium: React.FC<{f: number}> = ({f}) => {
           </mesh>
         )}
       </group>
-      {/* Falling paper bookmarks during choir frustration */}
       {!isEureka && [0, 1, 2].map((i) => {
         const t = (fall + i * 0.33) % 1;
         return (
@@ -101,10 +94,9 @@ const ChoirPodium: React.FC<{f: number}> = ({f}) => {
   );
 };
 
-/** Success Display & Swirling Storm of Yellow Sticky Notes (shot: success) */
+/** Success Display across the street at INSURANCE plaza (x=30, z=20.9) with swirling storm of yellow notes */
 const NotesStorm: React.FC<{f: number}> = ({f}) => (
-  <group position={[0, 0, 6.2]}>
-    {/* Display pedestal with giant stack of yellow Post-it pads */}
+  <group position={[30, 0, 20.9]}>
     <mesh position={[0, 0.45, 0]} castShadow receiveShadow>
       <boxGeometry args={[1.1, 0.9, 0.7]} />
       <meshToonMaterial color="#2f4f6a" />
@@ -113,15 +105,14 @@ const NotesStorm: React.FC<{f: number}> = ({f}) => (
       <boxGeometry args={[0.45, 0.24, 0.45]} />
       <meshToonMaterial color="#f7ea48" />
     </mesh>
-    {/* 16 swirling yellow Post-it notes */}
-    {Array.from({length: 16}, (_, i) => {
-      const ang = f * 0.05 + i * (Math.PI * 2 / 16);
+    {Array.from({length: 18}, (_, i) => {
+      const ang = f * 0.055 + i * (Math.PI * 2 / 18);
       const rad = 0.8 + 0.45 * (i % 3);
-      const y = 0.9 + ((i * 0.23 + f * 0.025) % 1.8);
+      const y = 0.9 + ((i * 0.21 + f * 0.028) % 1.9);
       return (
         <mesh
           key={i}
-          position={[Math.cos(ang) * rad, y, Math.sin(ang) * 0.7 + 0.6]}
+          position={[Math.cos(ang) * rad, y, Math.sin(ang) * 0.7 - 0.8]}
           rotation={[0.4 * Math.sin(f * 0.08 + i), ang, 0.3 * Math.cos(f * 0.07 + i)]}
           castShadow
         >
@@ -138,9 +129,9 @@ export const SetBefore: React.FC<P> = ({f, st, tod}) => (
   <>
     <Town tod={tod} />
     <StreetClock hours={st.clock} />
-    {f < 318 && <LabBench f={f} />}
-    {f >= 318 && f < 756 && <ChoirPodium f={f} />}
-    {f >= 756 && <NotesStorm f={f} />}
+    <LabBench f={f} />
+    <ChoirPodium f={f} />
+    <NotesStorm f={f} />
     {st.cars.map((c, i) => <Car key={i} c={c} />)}
   </>
 );
