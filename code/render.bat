@@ -32,15 +32,18 @@ if not "%1"=="" (
   echo   2) 03_shopping_cart (10s Short - The Fake Shopper Secret)
   echo   3) 02_sliced_bread (60s Short - Otto Rohwedder Story)
   echo   4) 01_example (Sample project)
-  set /p VID_CHOICE="Enter 1, 2, 3, or 4 (default 1): "
-  if "!VID_CHOICE!"=="2" (
+  echo   5) 05_postit_notes (30s Short - The Failed Glue)
+  set /p VID_CHOICE="Enter 1, 2, 3, 4, or 5 (default 5): "
+  if "!VID_CHOICE!"=="1" (
+    set VIDEO=04_speed_car
+  ) else if "!VID_CHOICE!"=="2" (
     set VIDEO=03_shopping_cart
   ) else if "!VID_CHOICE!"=="3" (
     set VIDEO=02_sliced_bread
   ) else if "!VID_CHOICE!"=="4" (
     set VIDEO=01_example
   ) else (
-    set VIDEO=04_speed_car
+    set VIDEO=05_postit_notes
   )
 )
 echo Active Video: %VIDEO%
