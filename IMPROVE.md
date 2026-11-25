@@ -57,3 +57,13 @@ Compared against `references/03_CAMERA_GRAMMAR.md` (which measured `7xS87iActkU`
 3. **Verification & Benchmark**:
    - [x] `gates.ts`: `GATES: PASS  hard=0  waived=0  warnings=0`
    - [x] Render time (`preview_05.mp4`, 900f): **124.97s (2m 5s, 0.139s/frame)** — **6.4x faster** than the initial ~13+ min baseline!
+
+---
+
+## Round 3: Visual Frame Inspection & 3D Depth Upgrade (`05_postit_notes`)
+Extracted 6 frames (`2s, 7s, 13s, 20s, 27s, 29s`) from Round 2 `preview_05.mp4` and diagnosed why it still felt flat:
+- Solid box props looked like crates instead of furniture, and `az ~ 0..18` camera angles flattened the 3D avenue into a 2D wall.
+- **Fixes Applied**:
+  - [x] Replaced solid boxes with **4-legged tables** (`LabTable`, `SuccessFinale` table) and **red choir risers** (`ChoirStage`).
+  - [x] Switched camera angles to 3D street-perspective (`az ±26..42` / `126..160`) with `magee` looking at the beaker and `youngman` looking at the hymnbook.
+  - [x] Re-rendered `preview_05.mp4` (**134.81s / 2m 15s**), `gates.ts`: `hard=0, warnings=1`, and visually verified all 6 extracted frames (`p5_r3_*.jpg`).
