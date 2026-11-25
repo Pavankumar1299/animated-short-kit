@@ -5,6 +5,32 @@
 
 ---
 
+## MANDATORY PRE-PRODUCTION CHECKLIST (Before Generating Any Frame / Video)
+Never write staging/camera code until every beat passes this cross-check:
+1. **Location & Environment**: Where does this beat *actually* happen in the story?
+   - Scientist / Inventor &rarr; **Inside a real Lab** (lab walls, chemical shelves, chalkboard, lab table), NOT a street sidewalk.
+   - Choir / Church &rarr; **Inside a Church** (arched stained-glass windows, wooden pews, choir risers, hymnbook), NOT a hat store.
+   - Store / Customers &rarr; **Inside the Grocery Store** (checkered floor, stocked aisles `z = -8..2`), NOT outside on the sidewalk.
+   - Street / Car Crash &rarr; **On the Street & Curb** with road, skid marks, tree, and sidewalk.
+2. **Cast Count & Who Talks to Whom**:
+   - List exact character count per beat, distinct `who` models, who has `talk: true` (speaking/mocking), who has `sweat: true` / reaction expression (`shock`, `sad`, `grin`), and explicit `gaze` targets (at the prop or scene partner, not blankly at the camera).
+3. **Props & Placement**:
+   - Every prop's `[x, y, z]` bounding box must be registered in `solids.ts` and separated from character paths so nobody stands inside furniture.
+4. **Camera Angles**:
+   - Use 3D depth angles (`az ±25..65`) and multi-key Ricks Clips moves (`arc`, `pullpush`, `dolly`), avoiding flat wall-facing shots and foreground occluders (`lamps`, `cars`, `shelves`).
+
+---
+
+## Round 5 Blueprint: True Indoor Sets (`05_postit_notes` Lab + Church, `03_shopping_cart` Store Interior)
+- **`05_postit_notes`**:
+  - `lab` & `mockery` (`0 - 10.6s`): **Indoor Chemistry Lab** at `x = -60, z = 0` (3 walls, tiled floor, chemical bottle shelves, chalkboard, hanging lamp, 4-legged lab table). Cast: `magee` (sweat, inspecting beaker) + `banker` (talk: true, mocking).
+  - `choir` & `eureka` (`10.6 - 25.2s`): **Indoor Church Sanctuary** at `x = 60, z = 0` (wood floor, stone walls, arched stained-glass windows, wooden pews, red choir risers, hymnbook). Cast: `youngman` (Art Fry, sweat, eureka) + `youngwoman` (talk: true) + `grandma`.
+  - `success` (`25.2 - 30.0s`): **Office Supply Plaza** at `x = 19, z = 19.5` (4-legged Post-it table + 24 swirling yellow notes). Cast: `magee` + `youngman`.
+- **`03_shopping_cart`**:
+  - Move `hook`, `refusal`, `revolution` **INSIDE the Grocery Store** (`x = -1.4..1.4, z = -1.5..2.2`, checkered floor between stocked aisles!). Cast: `goldman` (`talk: true`), `shopper` (walking with cart), `shopper2` + `grandma` (`talk: true`), `youngwoman` (walking with full cart).
+
+---
+
 ## Round 1: Initial Audit (2026-11-25)
 
 ### What Is Wrong Right Now

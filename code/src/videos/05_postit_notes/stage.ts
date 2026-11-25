@@ -15,91 +15,89 @@ export function stage(f: number): Stage {
 
   switch (s.name) {
     case 'lab': {
-      // Spencer Silver (magee) walks up to the LabTable at [-21.3, 0, 7.2] and inspects the beaker
-      const x = lerp(-23.6, -22.4, cl(lf / 42));
+      // INSIDE Chemistry Lab (x=-120, z=-1.5): Spencer Silver walks up beside the lab table
+      const x = lerp(-121.5, -120.2, cl(lf / 42));
       P.push({
         who: 'magee',
-        p: [x, 0, 7.25],
+        p: [x, 0, -1.5],
         ...seq(lf, [[0, 'walk', 'neutral'], [42, 'think', 'worried'], [100, 'shrug', 'sad']]),
         sweat: lf >= 70,
-        gaze: [-21.3, 1.0, 7.2] // Looking at the beaker on the lab table!
+        gaze: [-120.0, 1.0, -3.0]
       });
-      P.push({who: 'paperboy', p: [-30 + ((f * 0.045) % 16), 0, 19.3], act: 'walk', bg: true});
       break;
     }
 
     case 'mockery': {
-      // Outside FIRST NATIONAL BANK (21.5, 7.4): banker walks up, laughs/talks, magee sweats in shame
-      const bx = lerp(23.2, 22.0, cl(lf / 36));
+      // INSIDE Chemistry Lab (x=-120, z=-1.5): banker walks in, mocks magee
+      const bx = lerp(-118.0, -119.2, cl(lf / 36));
       P.push({
         who: 'magee',
-        p: [20.9, 0, 7.35],
+        p: [-120.7, 0, -1.5],
         ...seq(lf, [[0, 'slump', 'sad'], [50, 'think', 'worried']]),
         sweat: true
       });
       P.push({
         who: 'banker',
-        p: [bx, 0, 7.45],
+        p: [bx, 0, -1.4],
         ...seq(lf, [[0, 'walk', 'smirk'], [36, 'point', 'smug'], [85, 'wave', 'grin']]),
         talk: lf >= 45
       });
-      P.push({who: 'nurse', p: [28 - ((f * 0.035) % 16), 0, 21.4], act: 'walk', bg: true});
       break;
     }
 
     case 'choir': {
-      // Choir Stage at [-26.5, 0, 20.6]: Art Fry (youngman) paces with sweat; youngwoman & grandma react
-      const px = lerp(-27.8, -26.8, cl(lf / 55));
+      // INSIDE Church Sanctuary (x=120, z=-1.4): Art Fry (youngman) paces with sweat beside hymnbook; choir reacts
+      const px = lerp(118.5, 119.3, cl(lf / 55));
       P.push({
         who: 'youngman',
-        p: [px, 0, 19.5],
+        p: [px, 0, -1.4],
         ...seq(lf, [[0, 'tiredWalk', 'worried'], [55, 'shrug', 'sad'], [115, 'present', 'worried']]),
         sweat: lf >= 40,
-        gaze: [-26.5, 1.1, 20.6]
+        gaze: [120.0, 1.1, -2.6]
       });
       P.push({
         who: 'youngwoman',
-        p: [-25.5, 0, 19.6],
+        p: [120.6, 0, -1.4],
         ...seq(lf, [[0, 'idle', 'worried'], [70, 'talk', 'sad']]),
         talk: lf >= 70
       });
       P.push({
         who: 'grandma',
-        p: [-24.7, 0, 20.1],
+        p: [121.6, 0, -1.4],
         ...seq(lf, [[0, 'idle', 'neutral'], [80, 'talk', 'worried']])
       });
       break;
     }
 
     case 'eureka': {
-      // Choir Stage: youngman steps to podium, sticks yellow note, jumps in eureka!
-      const px = lerp(-27.2, -26.5, cl(lf / 32));
+      // INSIDE Church Sanctuary (x=120, z=-1.4): youngman sticks yellow note, jumps in eureka!
+      const px = lerp(119.0, 119.6, cl(lf / 32));
       P.push({
         who: 'youngman',
-        p: [px, 0, 19.45],
+        p: [px, 0, -1.4],
         ...seq(lf, [[0, 'walk', 'neutral'], [32, 'eureka', 'happy'], [105, 'proud', 'grin']]),
-        gaze: [-26.5, 1.1, 20.6]
+        gaze: [120.0, 1.1, -2.6]
       });
       P.push({
         who: 'youngwoman',
-        p: [-25.5, 0, 19.6],
+        p: [120.8, 0, -1.4],
         ...seq(lf, [[0, 'idle', 'surprised'], [42, 'cheer', 'happy']])
       });
       break;
     }
 
     case 'success': {
-      // Success Finale at [30, 0, 20.6]: magee & youngman celebrate beside Post-it table
+      // Outside INSURANCE / Office plaza (30.0, 19.5) with swirling Post-it storm
       const mx = lerp(28.5, 29.0, cl(lf / 30));
-      const yx = lerp(31.5, 31.0, cl(lf / 30));
+      const px = lerp(31.5, 31.0, cl(lf / 30));
       P.push({
         who: 'magee',
-        p: [mx, 0, 19.45],
+        p: [mx, 0, 19.5],
         ...seq(lf, [[0, 'walk', 'happy'], [30, 'cheer', 'grin']])
       });
       P.push({
         who: 'youngman',
-        p: [yx, 0, 19.55],
+        p: [px, 0, 19.4],
         ...seq(lf, [[0, 'walk', 'happy'], [30, 'wave', 'grin']])
       });
       break;
