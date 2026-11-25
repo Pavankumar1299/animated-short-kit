@@ -86,6 +86,7 @@ export function stage(f: number): Stage {
       [55, 'walk', 'surprised'],
       [W('speeding', 'speedster'), 'shrug', 'surprised']
     ]),
+    sweat: f >= 65,
     gaze: [carX, 0.8, carZ]
   });
 
@@ -98,6 +99,7 @@ export function stage(f: number): Stage {
       [0, 'walk', 'neutral'],
       [105, 'shrug', 'shock']
     ]),
+    sweat: f >= 105,
     gaze: [carX, 0.8, carZ]
   });
 
@@ -113,6 +115,7 @@ export function stage(f: number): Stage {
       [195, 'talk', 'smug'],
       [W('aftermath', 'lose') ?? 0, 'present', 'grin']
     ]),
+    talk: f >= 195,
     gaze: [carX, 0.8, carZ]
   });
 

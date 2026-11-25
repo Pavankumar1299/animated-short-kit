@@ -21,6 +21,7 @@ export function stage(f: number): Stage {
         who: 'magee',
         p: [x, 0, 7.25],
         ...seq(lf, [[0, 'walk', 'neutral'], [42, 'think', 'worried'], [100, 'shrug', 'sad']]),
+        sweat: lf >= 70,
         gaze: [-21.3, 1.0, 7.2] // Looking at the beaker on the lab table!
       });
       P.push({who: 'paperboy', p: [-30 + ((f * 0.045) % 16), 0, 19.3], act: 'walk', bg: true});
@@ -28,35 +29,39 @@ export function stage(f: number): Stage {
     }
 
     case 'mockery': {
-      // Outside FIRST NATIONAL BANK (21.5, 7.4): banker walks up to magee and mocks him
+      // Outside FIRST NATIONAL BANK (21.5, 7.4): banker walks up, laughs/talks, magee sweats in shame
       const bx = lerp(23.2, 22.0, cl(lf / 36));
       P.push({
         who: 'magee',
         p: [20.9, 0, 7.35],
-        ...seq(lf, [[0, 'slump', 'sad'], [50, 'think', 'worried']])
+        ...seq(lf, [[0, 'slump', 'sad'], [50, 'think', 'worried']]),
+        sweat: true
       });
       P.push({
         who: 'banker',
         p: [bx, 0, 7.45],
-        ...seq(lf, [[0, 'walk', 'smirk'], [36, 'point', 'smug'], [85, 'wave', 'grin']])
+        ...seq(lf, [[0, 'walk', 'smirk'], [36, 'point', 'smug'], [85, 'wave', 'grin']]),
+        talk: lf >= 45
       });
       P.push({who: 'nurse', p: [28 - ((f * 0.035) % 16), 0, 21.4], act: 'walk', bg: true});
       break;
     }
 
     case 'choir': {
-      // Choir Stage at [-26.5, 0, 20.6]: Art Fry (youngman) paces frustratedly beside podium; youngwoman & grandma sing
+      // Choir Stage at [-26.5, 0, 20.6]: Art Fry (youngman) paces with sweat; youngwoman & grandma react
       const px = lerp(-27.8, -26.8, cl(lf / 55));
       P.push({
         who: 'youngman',
         p: [px, 0, 19.5],
         ...seq(lf, [[0, 'tiredWalk', 'worried'], [55, 'shrug', 'sad'], [115, 'present', 'worried']]),
+        sweat: lf >= 40,
         gaze: [-26.5, 1.1, 20.6]
       });
       P.push({
         who: 'youngwoman',
         p: [-25.5, 0, 19.6],
-        ...seq(lf, [[0, 'idle', 'worried'], [70, 'talk', 'sad']])
+        ...seq(lf, [[0, 'idle', 'worried'], [70, 'talk', 'sad']]),
+        talk: lf >= 70
       });
       P.push({
         who: 'grandma',

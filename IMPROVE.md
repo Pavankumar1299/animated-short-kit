@@ -67,3 +67,15 @@ Extracted 6 frames (`2s, 7s, 13s, 20s, 27s, 29s`) from Round 2 `preview_05.mp4` 
   - [x] Replaced solid boxes with **4-legged tables** (`LabTable`, `SuccessFinale` table) and **red choir risers** (`ChoirStage`).
   - [x] Switched camera angles to 3D street-perspective (`az ±26..42` / `126..160`) with `magee` looking at the beaker and `youngman` looking at the hymnbook.
   - [x] Re-rendered `preview_05.mp4` (**134.81s / 2m 15s**), `gates.ts`: `hard=0, warnings=1`, and visually verified all 6 extracted frames (`p5_r3_*.jpg`).
+
+---
+
+## Round 4: Honest Ricks Clips Scorecard & Reaction/Prop Upgrade
+Audited against `02_STORY_FORMULA.md`, `03_CAMERA_GRAMMAR.md`, and `04_SHAPE_GUIDE.md`:
+
+| Criterion | Before Round 4 | Gap Found | Round 4 Fix |
+|---|---|---|---|
+| **Character Response** | `4/10` | `rig.tsx` has `talk: true` (viseme lip-sync) & `sweat: true` (nervous sweat drops), **unused in all 3 videos**. No reaction beat cutting to the victim's face. | Added `talk: true` on speaking/mocking characters (`banker`, `goldman`, `shopper2`, `cop`), `sweat: true` on stressed characters (`magee`, `preacher`, `oldman`, `paperboy`), and reaction camera key in `05/mockery`. |
+| **Story-Specific Props** | `6/10` | Lab jars/finale lacked in-world sticky-note spread on surrounding objects. | Added yellow Post-it notes stuck onto the lab bench & finale window/pedestal in `05/set.tsx`. |
+| **Positioning & Angles** | `7/10` | `03_shopping_cart` still used flatter `az ±15..22` angles. | Upgraded `03_shopping_cart/takes.ts` to 3D street-perspective `az ±32..42` angles. |
+| **Render Speed** | `9/10` | **0.139s/frame** (`2m 05s` for 900f) — 6.4x faster than baseline. | Keep ANGLE + `--concurrency=4` + `1024` shadow map. |

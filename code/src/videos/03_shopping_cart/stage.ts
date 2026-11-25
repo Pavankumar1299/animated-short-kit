@@ -48,6 +48,7 @@ export function stage(f: number): Stage {
           [28, 'present', 'proud'],
           [W('hook', 'push'), 'talk', 'happy']
         ]),
+        talk: lf >= W('hook', 'push'),
         gaze: 'cam'
       });
 
