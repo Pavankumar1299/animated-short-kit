@@ -1,10 +1,10 @@
 // Staging for 03_shopping_cart: characters, positions, gestures, expressions per frame
-import {TOTAL, shotAt, W} from '../../engine/core/clock';
-import {autoGaze} from '../../engine/core/staging';
-import {PersonP, seq} from '../../engine/chars/rig';
-import type {CarP, MeterP, Things} from '../../engine/kits/downtown/street';
-import type {CartP} from '../../engine/kits/grocery/store';
-export {TOTAL, shotAt};
+import { TOTAL, shotAt, W, cl, ease } from '../../engine/core/clock';
+import { autoGaze } from '../../engine/core/staging';
+import { PersonP, seq } from '../../engine/chars/rig';
+import type { CarP, MeterP, Things } from '../../engine/kits/downtown/street';
+import type { CartP } from '../../engine/kits/grocery/store';
+export { TOTAL, shotAt };
 
 export type Stage = {
   people: PersonP[];
@@ -17,23 +17,35 @@ export type Stage = {
   nStoryCars: number;
 };
 
+const lerp = (a: number, b: number, t: number) => a + (b - a) * ease(t);
+
 export function stage(f: number): Stage {
   const s = shotAt(f), lf = s.lf, P: PersonP[] = [], K: CarP[] = [], Ct: CartP[] = [], Mt: MeterP[] = [], Ex: string[] = [];
 
   // Street parking context
   K.push(
-    {p: [6.75, 0, 9.45], ry: Math.PI, col: '#2f4f6a'},
-    {p: [-6.75, 0, 9.45], ry: Math.PI, col: '#a8443a'}
+    { p: [6.75, 0, 9.45], ry: Math.PI, col: '#2f4f6a' },
+    { p: [-6.75, 0, 9.45], ry: Math.PI, col: '#a8443a' }
+  );
+
+  // Walking background pedestrians on separate far-sidewalk lanes (clear of bins at z=18.75)
+  P.push(
+    { who: 'paperboy', p: [-10 + ((f * 0.04) % 20), 0, 19.3], act: 'walk', bg: true },
+    { who: 'baker', p: [9 - ((f * 0.03) % 18), 0, 20.6], act: 'walk', bg: true }
   );
 
   switch (s.name) {
-    case 'hook':
-      // Goldman proudly presenting; paid female shopper pushing empty cart
+    case 'hook': {
+      // Goldman steps forward presenting; paid shopper actually walks along sidewalk pushing cart
+      const gx = lerp(-1.05, -0.65, cl(lf / 28));
+      const sx = lerp(1.55, 0.35, cl(lf / 85));
+      const cx = sx - 0.35;
       P.push({
         who: 'goldman',
-        p: [-0.65, 0, 7.4],
+        p: [gx, 0, 7.4],
         ...seq(lf, [
-          [0, 'present', 'proud'],
+          [0, 'walk', 'proud'],
+          [28, 'present', 'proud'],
           [W('hook', 'push'), 'talk', 'happy']
         ]),
         gaze: 'cam'
@@ -41,42 +53,47 @@ export function stage(f: number): Stage {
 
       P.push({
         who: 'shopper',
-        p: [0.85, 0, 7.4],
+        p: [sx, 0, 7.4],
         ...seq(lf, [
-          [0, 'idle', 'happy'],
-          [W('hook', 'push') - 6, 'walk', 'grin']
+          [0, 'walk', 'happy'],
+          [85, 'idle', 'grin']
         ]),
-        hold: {p: [0.55, 0, 7.4], ry: 0, id: 0, k: 0.9},
+        hold: { p: [cx, 0, 7.4], ry: 0, id: 0, k: 0.9 },
         gaze: 'cam'
       });
 
       Ct.push({
-        p: [0.55, 0, 7.4],
+        p: [cx, 0, 7.4],
         ry: 0,
         fill: 0
       });
       break;
+    }
 
-    case 'refusal':
-      // Real customers scoffing and crossing arms at the parked cart
+    case 'refusal': {
+      // Real customers (shopper2 & grandma) recoil and scoff at the parked cart
+      const sx2 = lerp(-0.35, -0.75, cl(lf / 36));
+      const gx = lerp(1.05, 0.72, cl(lf / 36));
       P.push({
         who: 'shopper2',
-        p: [-0.6, 0, 7.4],
+        p: [sx2, 0, 7.4],
         ...seq(lf, [
-          [0, 'cross', 'smirk'],
+          [0, 'walk', 'smirk'],
+          [36, 'cross', 'smirk'],
           [W('refusal', 'ridiculous'), 'point', 'smirk']
         ]),
-        gaze: [0.85, 1.4, 7.4]
+        gaze: [gx, 1.4, 7.4]
       });
 
       P.push({
-        who: 'woman',
-        p: [0.85, 0, 7.4],
+        who: 'grandma',
+        p: [gx, 0, 7.4],
         ...seq(lf, [
-          [0, 'talk', 'smug'],
+          [0, 'walk', 'smug'],
+          [36, 'talk', 'smug'],
           [W('refusal', 'baby'), 'shrug', 'smug']
         ]),
-        gaze: [-0.6, 1.4, 7.4]
+        gaze: [sx2, 1.4, 7.4]
       });
 
       // Parked empty cart they refuse to touch
@@ -86,12 +103,15 @@ export function stage(f: number): Stage {
         fill: 0
       });
       break;
+    }
 
-    case 'revolution':
-      // Trick worked: Goldman cheering; customer happily pushing full cart; coins bursting
+    case 'revolution': {
+      // Trick worked: Goldman cheering; youngwoman happily pushing full cart; coins bursting
+      const yx = lerp(1.45, 0.35, cl(lf / 75));
+      const cx = yx - 0.35;
       P.push({
         who: 'goldman',
-        p: [-0.65, 0, 7.4],
+        p: [-0.75, 0, 7.4],
         ...seq(lf, [
           [0, 'cheer', 'grin'],
           [W('revolution', 'billion'), 'proud', 'grin']
@@ -100,25 +120,26 @@ export function stage(f: number): Stage {
       });
 
       P.push({
-        who: 'woman',
-        p: [0.85, 0, 7.4],
+        who: 'youngwoman',
+        p: [yx, 0, 7.4],
         ...seq(lf, [
           [0, 'walk', 'happy'],
-          [W('revolution', 'billion'), 'cheer', 'grin']
+          [75, 'cheer', 'grin']
         ]),
-        hold: {p: [0.55, 0, 7.4], ry: 0, id: 0, k: 0.9},
+        hold: { p: [cx, 0, 7.4], ry: 0, id: 0, k: 0.9 },
         gaze: 'cam'
       });
 
       // Loaded grocery cart
       Ct.push({
-        p: [0.55, 0, 7.4],
+        p: [cx, 0, 7.4],
         ry: 0,
         fill: 1
       });
 
       Ex.push('coins', 'bulb');
       break;
+    }
   }
 
   autoGaze(P, Mt);

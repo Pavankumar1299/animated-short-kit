@@ -75,7 +75,7 @@ set OUTFILE=out\%VIDEO%_%SUF%.mp4
 echo.
 echo Rendering %COMP% composition to %OUTFILE%...
 set VIDEO=%VIDEO%
-call npx remotion render src/index.ts %COMP% "%OUTFILE%" --codec h264 --concurrency=2
+call npx remotion render src/index.ts %COMP% "%OUTFILE%" --codec h264 --gl=angle --concurrency=4
 
 if %errorlevel% equ 0 (
   echo.

@@ -18,7 +18,7 @@ export const TAKES: Take[] = [
     name: 'refusal',
     why: 'real customers scoffing and refusing to touch carts, tight push on mocking expressions',
     keys: [
-      K(R.refusal, ['shopper2', 'woman'], 'MS', -20, 5, 40, {push: 1.05}),
+      K(R.refusal, ['shopper2', 'grandma'], 'MS', -20, 5, 40, {push: 1.05}),
       K(T('refusal', 'ridiculous'), 'shopper2', 'MCU', -15, 3.5, 36, {move: 'dolly', lead: 0.25, dur: 0.8, push: 1.06})
     ]
   },
@@ -27,7 +27,7 @@ export const TAKES: Take[] = [
     why: 'Goldman cheering, full carts packed with groceries, pull-back reveal of bustling store',
     keys: [
       K(R.revolution, 'goldman', 'MS', 15, 5, 40, {push: 1.05}),
-      K(T('revolution', 'billion'), ['goldman', 'woman'], 'FS', -22, 7, 44, {move: 'pullpush', lead: 0.35, dur: 1.0, push: 1.04})
+      K(T('revolution', 'billion'), ['goldman', 'youngwoman'], 'FS', -22, 7, 44, {move: 'pullpush', lead: 0.35, dur: 1.0, push: 1.04})
     ]
   }
 ];

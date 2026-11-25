@@ -1,10 +1,10 @@
 // Staging for 04_speed_car: speeding car trajectory, crash impact, cop reaction, dazed driver
-import {TOTAL, shotAt, W} from '../../engine/core/clock';
-import {autoGaze} from '../../engine/core/staging';
-import {PersonP, seq} from '../../engine/chars/rig';
-import type {CarP, MeterP, Things} from '../../engine/kits/downtown/street';
-import type {CartP} from '../../engine/kits/grocery/store';
-export {TOTAL, shotAt};
+import { TOTAL, shotAt, W } from '../../engine/core/clock';
+import { autoGaze } from '../../engine/core/staging';
+import { PersonP, seq } from '../../engine/chars/rig';
+import type { CarP, MeterP, Things } from '../../engine/kits/downtown/street';
+import type { CartP } from '../../engine/kits/grocery/store';
+export { TOTAL, shotAt };
 
 export type Stage = {
   people: PersonP[];
@@ -67,26 +67,50 @@ export function stage(f: number): Stage {
     col: '#2f4f6a'
   });
 
+  // Background walking pedestrians on separate far-sidewalk lanes (clear of bins at z=18.75 and camera)
+  P.push(
+    { who: 'nurse', p: [-11 + ((f * 0.04) % 22), 0, 21.2], act: 'walk', bg: true },
+    { who: 'baker', p: [11 - ((f * 0.035) % 22), 0, 21.6], act: 'walk', bg: true }
+  );
+
   // --- CHARACTERS ---
-  // Spectator: Old Man safely back on the wide sidewalk
+  // Spectator: Old Man steps back in alarm as the speedster rockets past
+  const omU = Math.min(1, Math.max(0, (f - 65) / 45));
+  const omX = -4.5 - 0.8 * omU;
+  const omZ = 5.6 - 0.35 * omU;
   P.push({
     who: 'oldman',
-    p: [-4.5, 0, 5.6],
+    p: [omX, 0, omZ],
     ...seq(lf, [
       [0, 'idle', 'shock'],
+      [55, 'walk', 'surprised'],
       [W('speeding', 'speedster'), 'shrug', 'surprised']
     ]),
     gaze: [carX, 0.8, carZ]
   });
 
-  // Cop safely on the sidewalk near the store entrance
+  // Startled Paperboy further down the sidewalk jumping back as the car swerves
+  const pbU = Math.min(1, Math.max(0, (f - 105) / 35));
+  P.push({
+    who: 'paperboy',
+    p: [-6.5 - 0.6 * pbU, 0, 5.8 - 0.4 * pbU],
+    ...seq(lf, [
+      [0, 'walk', 'neutral'],
+      [105, 'shrug', 'shock']
+    ]),
+    gaze: [carX, 0.8, carZ]
+  });
+
+  // Cop walks briskly along the sidewalk toward the wrecked car (clear of car 0 sightline)
+  const copU = f >= 150 ? Math.min(1, (f - 150) / 45) : 0;
   P.push({
     who: 'cop',
-    p: [-2.2, 0, 5.6],
+    p: [-2.6 + 0.8 * copU, 0, 5.5 + 0.4 * copU],
     ...seq(lf, [
       [0, 'idle', 'smirk'],
       [W('crash', 'century-old') ?? 0, 'talk', 'shock'],
-      [W('aftermath', 'tree') ?? 0, 'talk', 'smug'],
+      [150, 'walk', 'smug'],
+      [195, 'talk', 'smug'],
       [W('aftermath', 'lose') ?? 0, 'present', 'grin']
     ]),
     gaze: [carX, 0.8, carZ]

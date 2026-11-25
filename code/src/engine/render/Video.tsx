@@ -25,7 +25,7 @@ const Lights: React.FC<{at: THREE.Vector3}> = ({at}) => {
     <ambientLight intensity={L.ambI} color={L.amb} />
     <hemisphereLight args={[L.skyFill, L.groundFill, L.hemiI]} />
     <directionalLight position={[at.x + L.sunOff[0], L.sunOff[1], at.z + L.sunOff[2]]} target={target} intensity={L.sunI} color={L.sun} castShadow
-      shadow-mapSize={[2048, 2048]} shadow-camera-left={-20} shadow-camera-right={20} shadow-camera-top={20} shadow-camera-bottom={-20} shadow-bias={-0.0004} />
+      shadow-mapSize={[1024, 1024]} shadow-camera-left={-20} shadow-camera-right={20} shadow-camera-top={20} shadow-camera-bottom={-20} shadow-bias={-0.0005} />
   </>);
 };
 

@@ -109,12 +109,31 @@ const SteamFX: React.FC<{p: [number, number, number]; f: number}> = ({p, f}) => 
   );
 };
 
+/** Tire Skid Marks left on the asphalt as the car swerves into the tree */
+const SkidMarks: React.FC<{f: number}> = ({f}) => {
+  if (f < 115) return null;
+  const u = Math.min(1, (f - 115) / 35);
+  return (
+    <group position={[-2.1, 0.015, 8.65]} rotation={[0, 0.22, 0]}>
+      <mesh position={[0, 0, -0.35]} rotation={[-Math.PI / 2, 0, 0]} scale={[u, 1, 1]}>
+        <planeGeometry args={[7.4, 0.16]} />
+        <meshBasicMaterial color="#1a181c" transparent opacity={0.75} depthWrite={false} />
+      </mesh>
+      <mesh position={[0, 0, 0.35]} rotation={[-Math.PI / 2, 0, 0]} scale={[u, 1, 1]}>
+        <planeGeometry args={[7.4, 0.16]} />
+        <meshBasicMaterial color="#1a181c" transparent opacity={0.75} depthWrite={false} />
+      </mesh>
+    </group>
+  );
+};
+
 type P = {d: any; f: number; st: Stage; cam: THREE.Vector3; vel: (THREE.Vector3 | null)[]; tod: Tod};
 
 export const SetBefore: React.FC<P> = ({f, st, tod}) => (
   <>
     <Town tod={tod} />
     <StreetClock hours={st.clock} />
+    <SkidMarks f={f} />
     {/* 100-year-old sturdy oak tree on the curb */}
     <Tree p={[3.5, 0, 7.8]} f={f} />
     {/* Cars */}
