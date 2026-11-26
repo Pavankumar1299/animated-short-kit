@@ -6,6 +6,7 @@ import {ThreeCanvas} from '@remotion/three';
 import {useThree} from '@react-three/fiber';
 import * as THREE from 'three';
 import {LOOK_LIGHT, LOOK_SKY} from '../look/look';
+import {SkyClouds} from '../look/SkyClouds';
 import {TOTAL, warp} from '../core/clock';
 import {stage, velocities} from '../core/staging';
 import {camAt, applyCam, flashAt, Cam} from '../camera/camera';
@@ -50,6 +51,7 @@ export const Video: React.FC = () => {
       {AUDIO.bed && <Audio src={staticFile(AUDIO.bed)} />}
       <ThreeCanvas width={width} height={height} shadows camera={{fov: 38, near: 0.05, far: 450}}>
         <color attach="background" args={[LOOK_SKY.day.cap]} />
+        <SkyClouds f={f} />
         <Rig c={cc} />
         <Lights at={cc.anchor} />
         <SetBefore d={d} f={f} st={st} cam={cam} vel={vel} tod="day" />

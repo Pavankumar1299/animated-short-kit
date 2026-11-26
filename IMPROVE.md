@@ -31,6 +31,28 @@ Never write staging/camera code until every beat passes this cross-check:
 
 ---
 
+## Ricks Clips Gold Standard (`code/out/sample.mp4` — 59.43s, 720x1280 @ 30fps)
+Inspected 8 frames (`sample_0.jpg`..`sample_7.jpg`) of the user's real *Ricks Clips* reference video:
+
+| Element | What `sample.mp4` Does | What We Must Apply (Current + Upcoming Videos) |
+|---|---|---|
+| **Characters** | Same 2D cut-out style (white egg head, stick limbs, thick ink outlines, hats/badges), **seated inside cars holding steering wheels** & reacting physically. | Keep 2D cut-out rig, use `talk: true`, `sweat: true`, `gaze`, and place characters inside vehicles/rooms interacting with props. |
+| **Trees & Nature** | Ridged bark trunk, spreading 3D branches, rich layered leaf clusters, **instanced 3D grass blades** along the roadside. | Replace plain sphere-on-cylinder trees with branching trunks, textured bark, dense foliage, and roadside grass tufts. |
+| **Vehicles & Roads** | Detailed cars/trucks with wheels, rims, windshields, **visible interior dashboard/steering wheel**, glowing **headlights & red taillights**, double-yellow road lines, wet/specular reflections. | Add glowing headlights/taillights, road markings, and interior/close-up vehicle framing. |
+| **Sky, Clouds & Mood** | **Gradient sky + layered 3D clouds + sunbeams/horizon haze**, shifting from bright sunny day to **dramatic rainy night** with fog & rain streaks. | Replace flat solid `<color attach="background" />` with a **Sky Dome + Layered 3D Clouds + Horizon Glow** component. |
+| **In-World Signs** | Bold readable props inside the 3D world (`DAYS SINCE LAST CRASH 7`, `TREE TOWING $ CASH ONLY $`, lit `DON'T HIT THIS TREE` neon arrow). | Add bold CanvasTexture story signs directly in the 3D set for every video. |
+| **Camera Variety** | High-angle chase/drone shot down the road (`sample_6`), **1st-person driver POV** through windshield (`sample_7`), driver-window CU (`sample_3`), ultra-low ground-up sky shot (`sample_4`). | Mix high-angle chase (`el: 16..24`), low-angle hero (`el: -4..0`), window CUs, and wide landscape reveals. |
+| **Narration Lock** | `59.43s` tight, zero-dead-air pacing, continuous music bed + SFX. | Keep `< 0.15s` pause gaps, `+14%..+16%` neural voice pace, and SFX synced to impacts/reveals. |
+
+---
+
+## Round 6: Applying `sample.mp4` Visual Quality (`SkyClouds` + `04_speed_car` Overhaul)
+- [x] Created shared `SkyClouds` component in `code/src/engine/look/SkyClouds.tsx` (sun disc + halo + drifting layered 3D clouds) and mounted it in `Video.tsx`.
+- [x] Upgraded `04_speed_car/set.tsx`: branching bark-ridged Oak Tree with 4 spreading limbs & multi-cluster canopy, roadside grass tufts, readable `DAYS SINCE LAST CRASH 7` Canvas2D sign, and steam/leaves FX.
+- [x] Verified `gates.ts` (`hard=0, warnings=6`), rendered `preview_04.mp4` (6.8 MB), and inspected extracted frames (`p4_r6_*.jpg`).
+
+---
+
 ## Round 1: Initial Audit (2026-11-25)
 
 ### What Is Wrong Right Now
