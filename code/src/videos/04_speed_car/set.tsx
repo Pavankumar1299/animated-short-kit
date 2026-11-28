@@ -4,6 +4,7 @@ import * as THREE from 'three';
 import type {Tod} from '../../engine/look/look';
 import {Town, StreetClock} from '../../engine/kits/downtown/town';
 import {Car} from '../../engine/kits/downtown/street';
+import {GlbModel} from '../../engine/kits/GlbModel';
 import type {Stage} from './stage';
 
 export const AUDIO: {voice: string | null; bed: string | null} = {
@@ -84,7 +85,7 @@ const GrassTufts: React.FC<{p: [number, number, number]}> = ({p}) => (
   </group>
 );
 
-/** Branching, Bark-Ridged 100-Year-Old Oak Tree at [3.5, 0, 7.8] */
+/** Branching CC0 Oak Tree (.glb) + Roadside Grass + Falling Leaves at [3.5, 0, 7.8] */
 const Tree: React.FC<{p: [number, number, number]; f: number}> = ({p, f}) => {
   const isCrashed = f >= 150;
   const crashT = Math.max(0, (f - 150) / 30);
@@ -93,56 +94,7 @@ const Tree: React.FC<{p: [number, number, number]; f: number}> = ({p, f}) => {
     <group position={p}>
       <mesh geometry={circ} material={mBlob} rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.01, 0]} scale={[2.0, 2.0, 1]} />
       <GrassTufts p={[0, 0, 0]} />
-
-      {/* Flared Root Base + Ridged Trunk */}
-      <mesh position={[0, 0.48, 0]} castShadow receiveShadow>
-        <cylinderGeometry args={[0.38, 0.72, 0.96, 12]} />
-        <meshToonMaterial color="#543622" />
-      </mesh>
-      <mesh position={[0, 2.0, 0]} castShadow receiveShadow>
-        <cylinderGeometry args={[0.28, 0.39, 2.2, 12]} />
-        <meshToonMaterial color="#623f28" />
-      </mesh>
-      {/* Vertical Bark Ridges */}
-      {[0, 1, 2, 3, 4, 5].map((i) => {
-        const ang = (i * Math.PI) / 3;
-        return (
-          <mesh key={i} position={[Math.cos(ang) * 0.34, 1.4, Math.sin(ang) * 0.34]} rotation={[0, -ang, 0]}>
-            <boxGeometry args={[0.05, 2.4, 0.06]} />
-            <meshToonMaterial color="#3c2416" />
-          </mesh>
-        );
-      })}
-
-      {/* 4 Spreading 3D Tree Limbs */}
-      {[
-        {pos: [-0.65, 2.85, 0.15] as [number, number, number], rot: [0, 0, 0.85] as [number, number, number], len: 1.5},
-        {pos: [0.68, 2.95, -0.1] as [number, number, number], rot: [0, 0, -0.78] as [number, number, number], len: 1.55},
-        {pos: [0.1, 3.05, 0.6] as [number, number, number], rot: [0.75, 0, 0.1] as [number, number, number], len: 1.3},
-        {pos: [-0.15, 3.1, -0.58] as [number, number, number], rot: [-0.75, 0, -0.1] as [number, number, number], len: 1.3}
-      ].map((b, i) => (
-        <mesh key={i} position={b.pos} rotation={b.rot} castShadow>
-          <cylinderGeometry args={[0.1, 0.17, b.len, 8]} />
-          <meshToonMaterial color="#583822" />
-        </mesh>
-      ))}
-
-      {/* Rich Multi-Cluster Canopy */}
-      <group position={[0, 3.7, 0]}>
-        {[
-          [0, 0.25, 0, 1.65, 1.25, 1.65, '#2d6837'],
-          [-1.05, 0.05, 0.25, 1.15, 0.9, 1.1, '#3a7e45'],
-          [1.05, 0.15, -0.15, 1.2, 0.95, 1.15, '#3a7e45'],
-          [0.3, 0.95, 0.55, 1.15, 0.9, 1.15, '#499a57'],
-          [-0.45, 0.85, -0.5, 1.1, 0.85, 1.1, '#499a57'],
-          [0, 1.55, 0, 0.95, 0.78, 0.95, '#5bb35d']
-        ].map(([x, y, z, sx, sy, sz, col], i) => (
-          <mesh key={i} position={[x as number, y as number, z as number]} scale={[sx as number, sy as number, sz as number]} castShadow>
-            <sphereGeometry args={[1, 12, 9]} />
-            <meshToonMaterial color={col as string} />
-          </mesh>
-        ))}
-      </group>
+      <GlbModel path="models/tree_detailed.glb" scale={4.2} position={[0, 0.15, 0]} />
 
       {/* Scattered Leaves floating down after collision */}
       {isCrashed &&

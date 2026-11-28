@@ -99,7 +99,7 @@ export const Car: React.FC<{c: CarP}> = ({c}) => {
   return (
     <group position={c.p} rotation={[0, c.ry ?? 0, 0]}>
       <mesh geometry={circ} material={MAT.blob} rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.01, 0]} scale={[2.3, 0.95, 1]} />
-      <GlbModel path="models/sedan.glb" paintColor={c.col ?? '#7a2f2a'} wheelSpin={sp} />
+      <GlbModel path="models/sedan.glb" wheelSpin={sp} rotation={[0, Math.PI / 2, 0]} scale={1.58} />
       {c.driver && <group position={[-0.22, 0, -0.34]}>
         <mesh geometry={sph} material={MAT.skin} position={[0, 1.3, 0]} scale={[0.15, 0.17, 0.15]} />
         <mesh geometry={cyl} material={bodyMat(c.driver)} position={[0, 1.44, 0]} scale={[0.13, 0.1, 0.13]} /><mesh geometry={cyl} material={bodyMat(c.driver)} position={[0, 1.4, 0]} scale={[0.22, 0.02, 0.22]} />

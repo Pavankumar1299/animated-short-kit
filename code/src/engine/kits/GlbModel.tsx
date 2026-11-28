@@ -97,6 +97,8 @@ export const GlbModel: React.FC<GlbProps> = ({
     instance.traverse((obj) => {
       if (obj.name.startsWith('Wheel_')) {
         obj.rotation.z = -wheelSpin;
+      } else if (obj.name.startsWith('wheel-')) {
+        obj.rotation.x = wheelSpin;
       }
     });
   }, [instance, wheelSpin]);
