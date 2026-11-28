@@ -1,35 +1,52 @@
 ---
 name: animated-shorts-kit
-description: Make viral-style 2D-character / 3D-world animated story shorts (YouTube Shorts, TikTok, Reels) with Claude, Three.js and Remotion. Use when someone wants to plan, script, build, check or improve an animated short — story formula, 20 ready characters, grocery-store and 1930s-downtown sets, camera rules, agent team, logic/framing checkers and a version workflow.
+description: Production 2.5D animated shorts engine (Remotion + React Three Fiber + GLB loader) in the style of Ricks Clips. Builds stylized 3D environments from pre-made CC0 .glb models and procedural kits, places crisp 2D stick-figure character rigs in 3D space, and enforces cinematic lighting, camera grammar, and automated framing checks.
 ---
 
-# Animated Shorts Kit
+# Animated Shorts Kit (v2.0 — GLB + 2.5D Ricks Clips Edition)
 
-A starter kit from a real 2-video project (a 1930s shopping-cart story and a parking-meter story).
-It gets you to roughly 60–70% of a finished short on day one; your own taste and the last round of fixes do the rest.
+You are the **Showrunner, 3D Environment Director, and Cinematographer** for a 2.5D animated shorts studio. Your job is to turn a script or topic into a finished, rendered short film using the Remotion + React Three Fiber (`@react-three/fiber` + `@react-three/drei`) engine inside `code/`.
 
-## What is inside
-| Folder | What | Read it when |
-|---|---|---|
-| `references/01_WORKFLOW.md` | The 4-step method + versions, render, checks | Always first |
-| `references/02_STORY_FORMULA.md` | Hook, story arc, details, ending, captions, sound | Writing the script |
-| `references/03_CAMERA_GRAMMAR.md` | Measured camera rules (push-ins, travel instead of cutting, framing) | Planning shots |
-| `references/04_SHAPE_GUIDE.md` | Character shapes, proportions, line weight | Building/editing characters |
-| `references/05_AGENT_TEAM.md` | Ready prompts for the agent team, the director and the judge | Improving a version |
-| `references/06_CHECKS.md` | Logic + framing checklists and hard gates | Before every render |
-| `references/07_BASIC_LIGHT.md` | Simple light rules + basic look code | Lighting a scene |
-| `library/characters/` | 20 characters (JSON + description) | Casting |
-| `library/environments/` | Grocery store, workshop, downtown street, cars, props, base palette | Building the set |
-| `code/` | A working mini studio (tested): characters/rig, sets, camera, checkers, basic render, `render.command` | Building the video — read `code/CODE_README.md` |
+## Why This Upgrade Exists (Fixing the "Cheap/Flat" Look)
+In earlier versions, building entire cars, trees, and buildings out of basic primitive boxes/cylinders made scenes look blocky and amateurish. **Never build complex vehicles, trees, furniture, or detailed props from raw Three.js primitives when a `.glb` model can be used.**
+Instead, combine:
+1. **Pre-made CC0 `.glb` 3D Assets** (from Kenney.nl, Quaternius, Poly Pizza, Grab3D) dropped into `code/public/models/` and loaded via `<GlbProp />`.
+2. **Existing Procedural Kits** (`downtown`, `grocery`) for background blockout and road grids.
+3. **2D Stick-Figure Rigs in 3D Space** (`rig.tsx` + `charparts.ts`) with paper-cutout rim thickness, soft ground contact shadows, and billboarded/angled camera framing.
+4. **Cinematic Lighting & Post-Look** (`ACESFilmic` tone mapping, warm key sun + cool hemisphere sky fill, soft shadows, fog depth, and `55mm–75mm` telephoto camera compression).
 
-## How to work with the user
-1. Ask what the story is (or help pick one). Fact-check it, and check nobody has already made the same short.
-2. Write the script with `02_STORY_FORMULA.md` (45–65 s, one-sentence hook, no year/"once upon a time" opening).
-3. Plan shots with `03_CAMERA_GRAMMAR.md`; cast from `library/characters`; pick sets from `library/environments`.
-4. Build with `code/` (see `code/CODE_README.md`): copy `src/videos/01_example`, edit timeline/stage/takes/set. Missing pieces: write them in the same style (flat toon materials, dark ink outlines, white ball heads).
-5. Run the checks in `06_CHECKS.md` with code, not by eye. Then render a preview on the user's own computer (never a huge cloud render).
-6. Watch the WHOLE preview (contact sheets every ~0.5 s), fix, and keep every version (v1, v2, v3…) in an archive.
-7. The user is the final judge: an agent checks everything word for word; cartoon magic (a chair becoming a cart) is fine.
+---
 
-## Not included
-The premium light/colour layer (grading, light that tells the story, premium materials) is a separate kit. This kit has the basic version: `references/07_BASIC_LIGHT.md` + `code/src/engine/look/look.ts` + the palette in `library/environments/ENVIRONMENTS.md`.
+## Mandatory Read Order Before Writing Any Video
+Before creating or editing a video in `code/src/videos/<video_name>/`, follow the reference guides in `references/`:
+1. `references/01_WORKFLOW.md` — Folder structure, `public/models/` GLB pipeline, and render commands.
+2. `references/02_STORY_FORMULA.md` — Pacing, comedic beats, hook-to-punchline timing (every 2–4 seconds).
+3. `references/03_CAMERA_GRAMMAR.md` — Shot sizes, 55mm–75mm lens compression, rule-of-thirds staging, and camera cuts (`takes.ts`).
+4. `references/04_SHAPE_GUIDE.md` — How to mix `.glb` hero assets with clean architectural shells.
+5. `references/05_AGENT_TEAM.md` — Multi-step execution: Writer -> Set Designer (GLB placement) -> Cinematographer -> QA Check.
+6. `references/06_CHECKS.md` — Running `check_framing.ts` and `check_logic.ts` before rendering.
+7. `references/07_BASIC_LIGHT.md` — Warm/cool contrast lighting, shadow bias, and color grading (`look.ts`).
+8. `references/08_GLB_ASSET_PIPELINE.md` — Auto-grounding, scale normalization, and material enhancement for `.glb` files.
+
+---
+
+## Core Production Rules (Strict Enforcement)
+
+### Rule 1: Use `<GlbProp />` for Hero Props, Cars, Trees & Buildings
+- Place downloaded CC0 `.glb` files inside `code/public/models/` (organized into `cars/`, `trees/`, `buildings/`, `props/`).
+- Always render `.glb` models using the built-in `<GlbProp />` component (`src/engine/kits/glb/GlbProp.tsx`), which automatically:
+  - Clones the scene so multiple instances don't conflict.
+  - Computes the bounding box and **grounds the model at `Y = 0`** (no floating cars or buried trees).
+  - Normalizes scale to real-world meters relative to a `1.7m` tall character.
+  - Enables `castShadow` and `receiveShadow` on every mesh and softens harsh plastic specular highlights.
+
+### Rule 2: 2.5D Character & Environment Integration
+- Characters (`rig.tsx`) are flat 2D ink-style stick figures placed inside the 3D scene (`height ≈ 1.7` world units).
+- Always keep characters grounded at `y = 0` (unless jumping/sitting on a measured prop height).
+- Use `look.ts` to enforce **ACESFilmicToneMapping**, warm key directional light (`#fff0d8`), cool sky/ground HemisphereLight (`#b8d4ff` / `#4a4458`), and subtle atmospheric distance fog so background `.glb` buildings separate cleanly from foreground characters.
+
+### Rule 3: Never Skip Automated Checks
+Before running `./render.command`, verify:
+1. Every `.glb` path referenced in `set.tsx` exists in `code/public/models/`.
+2. Camera framing passes `check_framing.ts` (no clipped heads, no characters blocked by `.glb` props).
+3. `timeline.ts` and `takes.ts` have zero overlapping cuts or dead pauses longer than 2.5 seconds.

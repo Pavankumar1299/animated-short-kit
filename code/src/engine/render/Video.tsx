@@ -49,7 +49,7 @@ export const Video: React.FC = () => {
     <AbsoluteFill style={{backgroundColor: '#000'}}>
       {AUDIO.voice && <Audio src={staticFile(AUDIO.voice)} />}
       {AUDIO.bed && <Audio src={staticFile(AUDIO.bed)} />}
-      <ThreeCanvas width={width} height={height} shadows camera={{fov: 38, near: 0.05, far: 450}}>
+      <ThreeCanvas width={width} height={height} shadows gl={{toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 1.05}} camera={{fov: 38, near: 0.05, far: 450}}>
         <color attach="background" args={[LOOK_SKY.day.cap]} />
         <SkyClouds f={f} />
         <Rig c={cc} />
