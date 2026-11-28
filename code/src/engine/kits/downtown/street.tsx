@@ -3,6 +3,7 @@
 import React, {useMemo} from 'react';
 import * as THREE from 'three';
 import {LOOK_RAMP as ramp, lookToon} from '../../look/look';   // LOOK
+import {GlbModel} from '../GlbModel';
 
 export type V3 = [number, number, number];
 export type CarP = {p: V3; ry?: number; col?: string; spin?: number; door?: number; driver?: string};
@@ -94,24 +95,12 @@ const winGeo = (() => { const sh = new THREE.Shape(); sh.moveTo(...WIN[0]); for 
 const fenderGeo = new THREE.SphereGeometry(1, 18, 10, 0, Math.PI * 2, 0, Math.PI / 2);
 
 export const Car: React.FC<{c: CarP}> = ({c}) => {
-  const col = bodyMat(c.col ?? '#7a2f2a'), sp = c.spin ?? 0;
+  const sp = c.spin ?? 0;
   return (
     <group position={c.p} rotation={[0, c.ry ?? 0, 0]}>
       <mesh geometry={circ} material={MAT.blob} rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.01, 0]} scale={[2.3, 0.95, 1]} />
-      <mesh geometry={carGeo} material={col} castShadow receiveShadow />
-      {[-0.8, 0.8].map((z) => <mesh key={'w' + z} geometry={winGeo} material={MAT.glass} position={[0, 0, z]} />)}
-      {[-1.3, 1.32].map((x) => [-0.78, 0.78].map((z) => <group key={x + '_' + z}>
-        <mesh geometry={fenderGeo} material={col} position={[x, 0.5, z * 1.03]} scale={[0.62, 0.42, 0.26]} castShadow />
-        <group position={[x, 0.36, z * 1.06]} rotation={[Math.PI / 2, sp, 0]}>
-          <mesh geometry={cyl} material={MAT.tire} scale={[0.36, 0.22, 0.36]} castShadow /><mesh geometry={cyl} material={MAT.white} scale={[0.25, 0.23, 0.25]} />
-          <mesh geometry={cyl} material={MAT.chrome} scale={[0.13, 0.24, 0.13]} /><mesh geometry={box} material={MAT.tire} scale={[0.04, 0.245, 0.2]} />
-        </group></group>))}
-      {[-0.8, 0.8].map((z) => <mesh key={z} geometry={box} material={MAT.tire} position={[0, 0.34, z * 1.02]} scale={[2.2, 0.05, 0.22]} />)}
-      {[-2.16, 2.16].map((x) => <mesh key={x} geometry={box} material={MAT.chrome} position={[x, 0.46, 0]} scale={[0.08, 0.1, 1.7]} castShadow />)}
-      <mesh geometry={box} material={MAT.chrome} position={[2.1, 0.76, 0]} scale={[0.06, 0.32, 0.62]} />
-      {[-0.5, 0.5].map((z) => <group key={z}><mesh geometry={sph} material={MAT.chrome} position={[2.0, 1.02, z]} scale={0.13} /><mesh geometry={circ} material={MAT.lamp} position={[2.12, 1.02, z]} rotation={[0, Math.PI / 2, 0]} scale={0.1} /></group>)}
-      <mesh geometry={sph} material={MAT.chrome} position={[2.06, 1.1, 0]} scale={[0.05, 0.08, 0.05]} />
-      {c.driver && <group position={[-0.25, 0, -0.3]}>
+      <GlbModel path="models/sedan.glb" paintColor={c.col ?? '#7a2f2a'} wheelSpin={sp} />
+      {c.driver && <group position={[-0.22, 0, -0.34]}>
         <mesh geometry={sph} material={MAT.skin} position={[0, 1.3, 0]} scale={[0.15, 0.17, 0.15]} />
         <mesh geometry={cyl} material={bodyMat(c.driver)} position={[0, 1.44, 0]} scale={[0.13, 0.1, 0.13]} /><mesh geometry={cyl} material={bodyMat(c.driver)} position={[0, 1.4, 0]} scale={[0.22, 0.02, 0.22]} />
         <mesh geometry={box} material={bodyMat(c.driver)} position={[0, 1.02, 0]} scale={[0.3, 0.36, 0.4]} /></group>}
